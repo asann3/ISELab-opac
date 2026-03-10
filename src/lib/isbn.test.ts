@@ -27,4 +27,8 @@ describe('formatToIsbn13', () => {
   it('10桁でも13桁でもない場合エラーを投げる', () => {
     expect(() => formatToIsbn13('12345')).toThrow()
   })
+
+  it('数字以外の文字を含む場合エラーを投げる', () => {
+    expect(() => formatToIsbn13('978-4-274-ABCDE-6')).toThrow()
+  })
 })
