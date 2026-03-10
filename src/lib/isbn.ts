@@ -13,10 +13,6 @@ export function formatToIsbn13(raw: string): ISBN13 {
     return `${isbn13Body}${checkDigit}` as ISBN13
   }
 
-  if (stripped.length !== 13) {
-    throw new Error(`Invalid ISBN: must be 10 or 13 digits, got ${stripped.length}`)
-  }
-
   return stripped as ISBN13
 }
 
