@@ -11,4 +11,10 @@ describe('formatToIsbn13', () => {
     const result = formatToIsbn13('978 4 274 21788 6')
     expect(result).toBe('9784274217886')
   })
+
+  it('ISBN-10をISBN-13に変換できる', () => {
+    // 『リーダブルコード』 ISBN-10: 4873115655 → ISBN-13: 9784873115658
+    const result = formatToIsbn13('4873115655')
+    expect(result).toBe('9784873115658')
+  })
 })
