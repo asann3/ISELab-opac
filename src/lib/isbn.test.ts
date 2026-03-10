@@ -23,4 +23,8 @@ describe('formatToIsbn13', () => {
     const result = formatToIsbn13('477414164X')
     expect(result).toBe('9784774141640')
   })
+
+  it('10桁でも13桁でもない場合エラーを投げる', () => {
+    expect(() => formatToIsbn13('12345')).toThrow()
+  })
 })
