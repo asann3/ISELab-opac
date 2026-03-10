@@ -6,4 +6,9 @@ describe('formatToIsbn13', () => {
     const result = formatToIsbn13('978-4-274-21788-6')
     expect(result).toBe('9784274217886')
   })
+
+  it('空白付きISBN-13を正規化できる', () => {
+    const result = formatToIsbn13('978 4 274 21788 6')
+    expect(result).toBe('9784274217886')
+  })
 })
