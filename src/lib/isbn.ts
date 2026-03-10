@@ -3,6 +3,10 @@ import type { ISBN13 } from '@/types/book'
 export function formatToIsbn13(raw: string): ISBN13 {
   const stripped = raw.replace(/[-\s]/g, '')
 
+  if (!/^(\d{10}|\d{9}X|\d{13})$/.test(stripped)) {
+    throw new Error(`Invalid ISBN: "${raw}"`)
+  }
+
   if (stripped.length === 10) {
     const isbn13Body = `978${stripped.slice(0, 9)}`
     const checkDigit = calculateCheckDigit(isbn13Body)
