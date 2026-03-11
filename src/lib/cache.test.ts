@@ -33,4 +33,18 @@ describe('cache', () => {
     expect(fetcher).toHaveBeenCalledOnce()
     expect(result).toEqual({ books: [mockBook], isStale: false })
   })
+
+  it('TTL超過後はfetcherを再度呼ぶ', async () => {
+    invalidateCache()
+    const fetcher = vi.fn().mockResolvedValue([mockBook])
+
+    await getBooks(fetcher)
+
+    vi.useFakeTimers()
+    vi.advanceTimersByTime(60_001)
+    await getBooks(fetcher)
+    vi.useRealTimers()
+
+    expect(fetcher).toHaveBeenCalledTimes(2)
+  })
 })
