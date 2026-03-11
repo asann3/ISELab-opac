@@ -58,4 +58,19 @@ describe('cache', () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2)
   })
+
+  it('fetcher失敗時に古いキャッシュがあればisStale:trueで返す', async () => {
+    invalidateCache()
+    const fetcher = vi.fn().mockResolvedValue([mockBook])
+    await getBooks(fetcher)
+
+    vi.useFakeTimers()
+    vi.advanceTimersByTime(60_001)
+    fetcher.mockRejectedValue(new Error('API error'))
+
+    const result = await getBooks(fetcher)
+    vi.useRealTimers()
+
+    expect(result).toEqual({ books: [mockBook], isStale: true })
+  })
 })
