@@ -22,4 +22,15 @@ describe('cache', () => {
     expect(fetcher).toHaveBeenCalledOnce()
     expect(result).toEqual({ books: [mockBook], isStale: false })
   })
+
+  it('TTL内なら2回目はfetcherを呼ばずキャッシュを返す', async () => {
+    invalidateCache()
+    const fetcher = vi.fn().mockResolvedValue([mockBook])
+
+    await getBooks(fetcher)
+    const result = await getBooks(fetcher)
+
+    expect(fetcher).toHaveBeenCalledOnce()
+    expect(result).toEqual({ books: [mockBook], isStale: false })
+  })
 })
