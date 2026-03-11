@@ -73,4 +73,11 @@ describe('cache', () => {
 
     expect(result).toEqual({ books: [mockBook], isStale: true })
   })
+
+  it('fetcher失敗時にキャッシュもなければエラーを投げる', async () => {
+    invalidateCache()
+    const fetcher = vi.fn().mockRejectedValue(new Error('API error'))
+
+    await expect(getBooks(fetcher)).rejects.toThrow('API error')
+  })
 })
