@@ -18,9 +18,16 @@ export async function getBooks(
     return { books: cache.books, isStale: false }
   }
 
-  const books = await fetcher()
-  cache = { books, timestamp: now }
-  return { books, isStale: false }
+  try {
+    const books = await fetcher()
+    cache = { books, timestamp: now }
+    return { books, isStale: false }
+  } catch (error) {
+    if (cache) {
+      return { books: cache.books, isStale: true }
+    }
+    throw error
+  }
 }
 
 export function invalidateCache(): void {
