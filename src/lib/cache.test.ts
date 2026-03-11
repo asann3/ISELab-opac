@@ -47,4 +47,15 @@ describe('cache', () => {
 
     expect(fetcher).toHaveBeenCalledTimes(2)
   })
+
+  it('invalidate後はfetcherを再度呼ぶ', async () => {
+    invalidateCache()
+    const fetcher = vi.fn().mockResolvedValue([mockBook])
+
+    await getBooks(fetcher)
+    invalidateCache()
+    await getBooks(fetcher)
+
+    expect(fetcher).toHaveBeenCalledTimes(2)
+  })
 })
