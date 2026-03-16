@@ -40,4 +40,13 @@ describe('middleware', () => {
 
     expect(response.status).not.toBe(401)
   })
+
+  it('POST /api/books に認証なしで401を返す', async () => {
+    const { middleware } = await import('./middleware')
+    const request = createRequest('/api/books', { method: 'POST' })
+    const response = middleware(request)
+
+    expect(response.status).toBe(401)
+    expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
+  })
 })
