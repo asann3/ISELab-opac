@@ -1,0 +1,40 @@
+import type { BookRecord, ISBN13 } from '@/types/book'
+
+export async function fetchBookMetadata(
+  isbn13: string,
+): Promise<BookRecord | null> {
+  const openbd = await fetchFromOpenBD(isbn13)
+  if (!openbd) {
+    return null
+  }
+
+  return {
+    isbn13: isbn13 as ISBN13,
+    title: openbd.title,
+    author: openbd.author ?? null,
+    publisher: openbd.publisher ?? null,
+    ndc: null,
+    thumbnailUrl: openbd.cover ?? null,
+    createdAt: new Date().toISOString(),
+  }
+}
+
+async function fetchFromOpenBD(isbn13: string) {
+  try {
+    const res = await fetch(
+      `https://api.openbd.jp/v1/get?isbn=${isbn13}`,
+    )
+    const data = await res.json()
+    if (!data?.[0]?.summary) {
+      return null
+    }
+    return data[0].summary as {
+      title: string
+      author: string
+      publisher: string
+      cover: string
+    }
+  } catch {
+    return null
+  }
+}
