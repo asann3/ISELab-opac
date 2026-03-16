@@ -72,4 +72,29 @@ describe('getAllBooks', () => {
 
     expect(result).toEqual([])
   })
+
+  it('null値のセルをnullとして扱う', async () => {
+    mockGet.mockResolvedValue({
+      data: {
+        values: [
+          ['isbn13', 'title', 'author', 'publisher', 'ndc', 'thumbnailUrl', 'createdAt'],
+          ['9784274217886', 'テスト書籍', '', '', '', '', '2026-03-10T00:00:00Z'],
+        ],
+      },
+    })
+
+    const result = await getAllBooks()
+
+    expect(result).toEqual([
+      {
+        isbn13: '9784274217886',
+        title: 'テスト書籍',
+        author: null,
+        publisher: null,
+        ndc: null,
+        thumbnailUrl: null,
+        createdAt: '2026-03-10T00:00:00Z',
+      },
+    ])
+  })
 })
