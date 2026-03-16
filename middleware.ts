@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   }
 
   const authorization = request.headers.get('Authorization')
-  if (!authorization) {
+  if (!authorization || !isValidAuth(authorization)) {
     return new NextResponse(null, {
       status: 401,
       headers: { 'WWW-Authenticate': 'Basic' },
@@ -22,4 +22,13 @@ export function middleware(request: NextRequest) {
   }
 
   return NextResponse.next()
+}
+
+function isValidAuth(authorization: string): boolean {
+  const [scheme, encoded] = authorization.split(' ')
+  if (scheme !== 'Basic' || !encoded) return false
+
+  const decoded = atob(encoded)
+  const [, password] = decoded.split(':')
+  return password === process.env.BASIC_AUTH_PASSWORD
 }
