@@ -49,4 +49,26 @@ describe('middleware', () => {
     expect(response.status).toBe(401)
     expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
   })
+
+  it('POST /api/books に正しい認証で通過する', async () => {
+    const { middleware } = await import('./middleware')
+    const request = createRequest('/api/books', {
+      method: 'POST',
+      authorization: basicAuth(TEST_PASSWORD),
+    })
+    const response = middleware(request)
+
+    expect(response.status).not.toBe(401)
+  })
+
+  it('POST /api/books に不正な認証で401を返す', async () => {
+    const { middleware } = await import('./middleware')
+    const request = createRequest('/api/books', {
+      method: 'POST',
+      authorization: basicAuth('wrong-password'),
+    })
+    const response = middleware(request)
+
+    expect(response.status).toBe(401)
+  })
 })
