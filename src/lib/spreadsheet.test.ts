@@ -58,4 +58,18 @@ describe('getAllBooks', () => {
       },
     ])
   })
+
+  it('データが空の場合は空配列を返す', async () => {
+    mockGet.mockResolvedValue({
+      data: {
+        values: [
+          ['isbn13', 'title', 'author', 'publisher', 'ndc', 'thumbnailUrl', 'createdAt'],
+        ],
+      },
+    })
+
+    const result = await getAllBooks()
+
+    expect(result).toEqual([])
+  })
 })
