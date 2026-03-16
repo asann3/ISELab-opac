@@ -7,13 +7,18 @@ export async function fetchBookMetadata(
   const ndc = await fetchNdcFromNDL(isbn13)
 
   if (openbd) {
+    let thumbnailUrl = openbd.cover || null
+    if (!thumbnailUrl) {
+      const googleBooks = await fetchFromGoogleBooks(isbn13)
+      thumbnailUrl = googleBooks?.imageLinks?.thumbnail ?? null
+    }
     return {
       isbn13,
       title: openbd.title,
       author: openbd.author || null,
       publisher: openbd.publisher || null,
       ndc,
-      thumbnailUrl: openbd.cover || null,
+      thumbnailUrl,
       createdAt: new Date().toISOString(),
     }
   }
