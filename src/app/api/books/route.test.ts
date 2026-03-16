@@ -107,4 +107,22 @@ describe('POST /api/books', () => {
     expect(json.book.createdAt).toBeDefined()
     expect(invalidateCache).toHaveBeenCalled()
   })
+
+  it('不正ISBNで400を返す', async () => {
+    const { POST } = await import('./route')
+    const request = new Request('http://localhost/api/books', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isbn13: 'invalid',
+        title: 'テスト',
+      }),
+    })
+
+    const response = await POST(request)
+    const json = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(json.error).toBeDefined()
+  })
 })
