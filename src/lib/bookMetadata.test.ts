@@ -46,6 +46,43 @@ describe('fetchBookMetadata', () => {
     })
   })
 
+  it('NDLからNDCを取得できる', async () => {
+    const mockFetch = vi.mocked(fetch)
+    mockFetch.mockImplementation(async (url) => {
+      const urlStr = url.toString()
+      if (urlStr.includes('openbd')) {
+        return new Response(
+          JSON.stringify([
+            {
+              summary: {
+                title: 'リーダブルコード',
+                author: 'Dustin Boswell',
+                publisher: 'オライリージャパン',
+                cover: '',
+              },
+            },
+          ]),
+        )
+      }
+      if (urlStr.includes('ndlsearch')) {
+        return new Response(
+          `<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/">
+            <records><record><recordPacking>string</recordPacking><recordData>
+              &lt;dcterms:subject rdf:resource="http://id.ndl.go.jp/class/ndc9/007.64"/&gt;
+            </recordData></record></records>
+          </searchRetrieveResponse>`,
+        )
+      }
+      return new Response('', { status: 404 })
+    })
+
+    const result = await fetchBookMetadata('9784873115658')
+
+    expect(result).toMatchObject({
+      ndc: '007.64',
+    })
+  })
+
   it('全API失敗時にnullを返す', async () => {
     const mockFetch = vi.mocked(fetch)
     mockFetch.mockRejectedValue(new Error('Network error'))
