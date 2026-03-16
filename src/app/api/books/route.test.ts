@@ -87,7 +87,7 @@ describe('POST /api/books', () => {
     vi.mocked(saveBookToSpreadsheet).mockResolvedValue(undefined)
 
     const { POST } = await import('./route')
-    const request = new Request('http://localhost/api/books', {
+    const request = new Request('http://example.com/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -114,7 +114,7 @@ describe('POST /api/books', () => {
 
   it('不正ISBNで400を返す', async () => {
     const { POST } = await import('./route')
-    const request = new Request('http://localhost/api/books', {
+    const request = new Request('http://example.com/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -137,7 +137,7 @@ describe('POST /api/books', () => {
     )
 
     const { POST } = await import('./route')
-    const request = new Request('http://localhost/api/books', {
+    const request = new Request('http://example.com/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -150,6 +150,28 @@ describe('POST /api/books', () => {
     const json = await response.json()
 
     expect(response.status).toBe(409)
+    expect(json.error).toBeDefined()
+  })
+
+  it('Sheets API障害で500を返す', async () => {
+    vi.mocked(saveBookToSpreadsheet).mockRejectedValue(
+      new Error('Sheets API unavailable'),
+    )
+
+    const { POST } = await import('./route')
+    const request = new Request('http://example.com/api/books', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isbn13: mockBook.isbn13,
+        title: mockBook.title,
+      }),
+    })
+
+    const response = await POST(request)
+    const json = await response.json()
+
+    expect(response.status).toBe(500)
     expect(json.error).toBeDefined()
   })
 })
