@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // テストリスト: middleware.ts (Basic認証)
 // [ ] GET /api/books は認証なしで通過する
@@ -12,7 +12,10 @@ import { NextRequest } from 'next/server'
 
 const TEST_PASSWORD = 'test-password'
 
-function createRequest(path: string, options?: { method?: string; authorization?: string }) {
+function createRequest(
+  path: string,
+  options?: { method?: string; authorization?: string },
+) {
   const url = `http://example.com${path}`
   const headers = new Headers()
   if (options?.authorization) {
@@ -70,5 +73,32 @@ describe('middleware', () => {
     const response = middleware(request)
 
     expect(response.status).toBe(401)
+  })
+
+  it('/register に認証なしで401を返す', async () => {
+    const { middleware } = await import('./middleware')
+    const request = createRequest('/register')
+    const response = middleware(request)
+
+    expect(response.status).toBe(401)
+    expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
+  })
+
+  it('/register に正しい認証で通過する', async () => {
+    const { middleware } = await import('./middleware')
+    const request = createRequest('/register', {
+      authorization: basicAuth(TEST_PASSWORD),
+    })
+    const response = middleware(request)
+
+    expect(response.status).not.toBe(401)
+  })
+
+  it('静的ファイルは認証不要で通過する', async () => {
+    const { middleware } = await import('./middleware')
+    const request = createRequest('/_next/static/chunk.js')
+    const response = middleware(request)
+
+    expect(response.status).not.toBe(401)
   })
 })
