@@ -41,9 +41,7 @@ export async function fetchBookMetadata(
 
 async function fetchFromOpenBD(isbn13: string) {
   try {
-    const res = await fetch(
-      `https://api.openbd.jp/v1/get?isbn=${isbn13}`,
-    )
+    const res = await fetch(`https://api.openbd.jp/v1/get?isbn=${isbn13}`)
     const data = await res.json()
     if (!data?.[0]?.summary) {
       return null

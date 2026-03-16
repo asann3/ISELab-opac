@@ -11,7 +11,7 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth })
 
-const spreadsheetId = process.env.SPREADSHEET_ID!
+const spreadsheetId = process.env.SPREADSHEET_ID ?? ''
 const sheetName = process.env.SHEET_NAME ?? 'Books'
 
 export async function getAllBooks(): Promise<BookRecord[]> {
@@ -43,9 +43,7 @@ export class DuplicateIsbnError extends Error {
   }
 }
 
-export async function saveBookToSpreadsheet(
-  book: BookRecord,
-): Promise<void> {
+export async function saveBookToSpreadsheet(book: BookRecord): Promise<void> {
   const existing = await getAllBooks()
   if (existing.some((b) => b.isbn13 === book.isbn13)) {
     throw new DuplicateIsbnError(book.isbn13)

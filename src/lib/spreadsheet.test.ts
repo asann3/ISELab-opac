@@ -33,7 +33,15 @@ import {
   saveBookToSpreadsheet,
 } from './spreadsheet'
 
-const HEADER_ROW = ['isbn13', 'title', 'author', 'publisher', 'ndc', 'thumbnailUrl', 'createdAt']
+const HEADER_ROW = [
+  'isbn13',
+  'title',
+  'author',
+  'publisher',
+  'ndc',
+  'thumbnailUrl',
+  'createdAt',
+]
 
 const toRow = (book: typeof mockBook) => [
   book.isbn13,
