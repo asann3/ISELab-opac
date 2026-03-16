@@ -73,3 +73,38 @@ describe('GET /api/books', () => {
     expect(json).toEqual({ error: 'Sheets API error' })
   })
 })
+
+describe('POST /api/books', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('書籍を登録して201を返す', async () => {
+    vi.mocked(saveBookToSpreadsheet).mockResolvedValue(undefined)
+
+    const { POST } = await import('./route')
+    const request = new Request('http://localhost/api/books', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isbn13: mockBook.isbn13,
+        title: mockBook.title,
+        author: mockBook.author,
+        publisher: mockBook.publisher,
+        ndc: mockBook.ndc,
+        thumbnailUrl: mockBook.thumbnailUrl,
+      }),
+    })
+
+    const response = await POST(request)
+    const json = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(json.book).toMatchObject({
+      isbn13: mockBook.isbn13,
+      title: mockBook.title,
+    })
+    expect(json.book.createdAt).toBeDefined()
+    expect(invalidateCache).toHaveBeenCalled()
+  })
+})
