@@ -45,4 +45,13 @@ describe('fetchBookMetadata', () => {
       thumbnailUrl: 'https://cover.openbd.jp/9784873115658.jpg',
     })
   })
+
+  it('全API失敗時にnullを返す', async () => {
+    const mockFetch = vi.mocked(fetch)
+    mockFetch.mockRejectedValue(new Error('Network error'))
+
+    const result = await fetchBookMetadata('9784873115658')
+
+    expect(result).toBeNull()
+  })
 })
