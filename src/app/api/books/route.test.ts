@@ -44,4 +44,32 @@ describe('GET /api/books', () => {
       isStale: false,
     })
   })
+
+  it('キャッシュ更新失敗時に古いキャッシュをisStale:trueで返す', async () => {
+    vi.mocked(getBooks).mockResolvedValue({
+      books: [mockBook],
+      isStale: true,
+    })
+
+    const { GET } = await import('./route')
+    const response = await GET()
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json).toEqual({
+      books: [mockBook],
+      isStale: true,
+    })
+  })
+
+  it('キャッシュなし+API障害で500を返す', async () => {
+    vi.mocked(getBooks).mockRejectedValue(new Error('Sheets API error'))
+
+    const { GET } = await import('./route')
+    const response = await GET()
+    const json = await response.json()
+
+    expect(response.status).toBe(500)
+    expect(json).toEqual({ error: 'Sheets API error' })
+  })
 })
