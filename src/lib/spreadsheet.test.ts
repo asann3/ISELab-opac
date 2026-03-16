@@ -27,7 +27,7 @@ vi.mock('googleapis', () => ({
   },
 }))
 
-import { getAllBooks } from './spreadsheet'
+import { getAllBooks, saveBookToSpreadsheet } from './spreadsheet'
 
 describe('getAllBooks', () => {
   beforeEach(() => {
@@ -96,5 +96,32 @@ describe('getAllBooks', () => {
         createdAt: '2026-03-10T00:00:00Z',
       },
     ])
+  })
+})
+
+describe('saveBookToSpreadsheet', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('BookRecordをスプレッドシートの末尾に追記する', async () => {
+    mockGet.mockResolvedValue({
+      data: { values: [['isbn13', 'title', 'author', 'publisher', 'ndc', 'thumbnailUrl', 'createdAt']] },
+    })
+    mockAppend.mockResolvedValue({})
+
+    const book: BookRecord = {
+      isbn13: '9784274217886' as BookRecord['isbn13'],
+      title: 'テスト書籍',
+      author: '著者',
+      publisher: '出版社',
+      ndc: '007',
+      thumbnailUrl: null,
+      createdAt: '2026-03-10T00:00:00Z',
+    }
+
+    await saveBookToSpreadsheet(book)
+
+    expect(mockAppend).toHaveBeenCalledOnce()
   })
 })
