@@ -22,14 +22,11 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = await request.json()
 
-  let isbn13
+  let isbn13: ReturnType<typeof formatToIsbn13>
   try {
     isbn13 = formatToIsbn13(body.isbn13 ?? '')
   } catch {
-    return NextResponse.json(
-      { error: 'Invalid ISBN format' },
-      { status: 400 },
-    )
+    return NextResponse.json({ error: 'Invalid ISBN format' }, { status: 400 })
   }
 
   const book: BookRecord = {
