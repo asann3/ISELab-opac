@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getBooks, invalidateCache } from '@/lib/cache'
+import { formatToIsbn13 } from '@/lib/isbn'
 import { getAllBooks, saveBookToSpreadsheet } from '@/lib/spreadsheet'
-import type { BookRecord, ISBN13 } from '@/types/book'
+import type { BookRecord } from '@/types/book'
 
 export async function GET() {
   try {
@@ -17,8 +18,18 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = await request.json()
 
+  let isbn13
+  try {
+    isbn13 = formatToIsbn13(body.isbn13 ?? '')
+  } catch {
+    return NextResponse.json(
+      { error: 'Invalid ISBN format' },
+      { status: 400 },
+    )
+  }
+
   const book: BookRecord = {
-    isbn13: body.isbn13 as ISBN13,
+    isbn13,
     title: body.title,
     author: body.author ?? null,
     publisher: body.publisher ?? null,
