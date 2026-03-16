@@ -86,6 +86,45 @@ describe('fetchBookMetadata', () => {
     })
   })
 
+  it('OpenBD失敗時にGoogle Booksにフォールバックする', async () => {
+    const mockFetch = vi.mocked(fetch)
+    mockFetch.mockImplementation(async (url) => {
+      const urlStr = url.toString()
+      if (urlStr.includes('openbd')) {
+        return new Response(JSON.stringify([null]))
+      }
+      if (urlStr.includes('googleapis.com/books')) {
+        return new Response(
+          JSON.stringify({
+            totalItems: 1,
+            items: [
+              {
+                volumeInfo: {
+                  title: 'Readable Code',
+                  authors: ['Dustin Boswell'],
+                  publisher: "O'Reilly",
+                  imageLinks: {
+                    thumbnail: 'https://books.google.com/thumb.jpg',
+                  },
+                },
+              },
+            ],
+          }),
+        )
+      }
+      return new Response('', { status: 404 })
+    })
+
+    const result = await fetchBookMetadata(TEST_ISBN)
+
+    expect(result).toMatchObject({
+      title: 'Readable Code',
+      author: 'Dustin Boswell',
+      publisher: "O'Reilly",
+      thumbnailUrl: 'https://books.google.com/thumb.jpg',
+    })
+  })
+
   it('全API失敗時にnullを返す', async () => {
     const mockFetch = vi.mocked(fetch)
     mockFetch.mockRejectedValue(new Error('Network error'))
