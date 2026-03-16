@@ -6,10 +6,14 @@ vi.mock('@/lib/cache', () => ({
   invalidateCache: vi.fn(),
 }))
 
-vi.mock('@/lib/spreadsheet', () => ({
-  getAllBooks: vi.fn(),
-  saveBookToSpreadsheet: vi.fn(),
-}))
+vi.mock('@/lib/spreadsheet', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/spreadsheet')>()
+  return {
+    ...actual,
+    getAllBooks: vi.fn(),
+    saveBookToSpreadsheet: vi.fn(),
+  }
+})
 
 import { getBooks, invalidateCache } from '@/lib/cache'
 import { saveBookToSpreadsheet } from '@/lib/spreadsheet'
@@ -123,6 +127,29 @@ describe('POST /api/books', () => {
     const json = await response.json()
 
     expect(response.status).toBe(400)
+    expect(json.error).toBeDefined()
+  })
+
+  it('ISBN重複で409を返す', async () => {
+    const { DuplicateIsbnError } = await import('@/lib/spreadsheet')
+    vi.mocked(saveBookToSpreadsheet).mockRejectedValue(
+      new DuplicateIsbnError(mockBook.isbn13),
+    )
+
+    const { POST } = await import('./route')
+    const request = new Request('http://localhost/api/books', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isbn13: mockBook.isbn13,
+        title: mockBook.title,
+      }),
+    })
+
+    const response = await POST(request)
+    const json = await response.json()
+
+    expect(response.status).toBe(409)
     expect(json.error).toBeDefined()
   })
 })
