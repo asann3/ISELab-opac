@@ -7,6 +7,7 @@ vi.mock('@/lib/cache', () => ({
 }))
 
 vi.mock('@/lib/spreadsheet', () => ({
+  getAllBooks: vi.fn(),
   saveBookToSpreadsheet: vi.fn(),
 }))
 
