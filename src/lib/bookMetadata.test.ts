@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ISBN13 } from '@/types/book'
 
 // テストリスト: fetchBookMetadata
 // [ ] OpenBDからタイトル・著者・出版社・書影を取得できる
@@ -8,6 +9,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // [ ] OpenBDとNDLの結果をマージして返す
 
 import { fetchBookMetadata } from './bookMetadata'
+
+const TEST_ISBN = '9784873115658' as ISBN13
 
 describe('fetchBookMetadata', () => {
   beforeEach(() => {
@@ -35,7 +38,7 @@ describe('fetchBookMetadata', () => {
       ),
     )
 
-    const result = await fetchBookMetadata('9784873115658')
+    const result = await fetchBookMetadata(TEST_ISBN)
 
     expect(result).toMatchObject({
       isbn13: '9784873115658',
@@ -76,7 +79,7 @@ describe('fetchBookMetadata', () => {
       return new Response('', { status: 404 })
     })
 
-    const result = await fetchBookMetadata('9784873115658')
+    const result = await fetchBookMetadata(TEST_ISBN)
 
     expect(result).toMatchObject({
       ndc: '007.64',
@@ -87,7 +90,7 @@ describe('fetchBookMetadata', () => {
     const mockFetch = vi.mocked(fetch)
     mockFetch.mockRejectedValue(new Error('Network error'))
 
-    const result = await fetchBookMetadata('9784873115658')
+    const result = await fetchBookMetadata(TEST_ISBN)
 
     expect(result).toBeNull()
   })
