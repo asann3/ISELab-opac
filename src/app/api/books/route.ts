@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { getBooks, invalidateCache } from '@/lib/cache'
 import { formatToIsbn13 } from '@/lib/isbn'
-import { getAllBooks, saveBookToSpreadsheet } from '@/lib/spreadsheet'
+import {
+  DuplicateIsbnError,
+  getAllBooks,
+  saveBookToSpreadsheet,
+} from '@/lib/spreadsheet'
 import type { BookRecord } from '@/types/book'
 
 export async function GET() {
@@ -38,7 +42,15 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
   }
 
-  await saveBookToSpreadsheet(book)
+  try {
+    await saveBookToSpreadsheet(book)
+  } catch (error) {
+    if (error instanceof DuplicateIsbnError) {
+      return NextResponse.json({ error: error.message }, { status: 409 })
+    }
+    throw error
+  }
+
   invalidateCache()
   return NextResponse.json({ book }, { status: 201 })
 }
