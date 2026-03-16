@@ -35,3 +35,38 @@ export async function getAllBooks(): Promise<BookRecord[]> {
     createdAt: row[6],
   }))
 }
+
+export class DuplicateIsbnError extends Error {
+  constructor(isbn13: string) {
+    super(`ISBN ${isbn13} is already registered`)
+    this.name = 'DuplicateIsbnError'
+  }
+}
+
+export async function saveBookToSpreadsheet(
+  book: BookRecord,
+): Promise<void> {
+  const existing = await getAllBooks()
+  if (existing.some((b) => b.isbn13 === book.isbn13)) {
+    throw new DuplicateIsbnError(book.isbn13)
+  }
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: `${sheetName}!A:G`,
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [
+        [
+          book.isbn13,
+          book.title,
+          book.author ?? '',
+          book.publisher ?? '',
+          book.ndc ?? '',
+          book.thumbnailUrl ?? '',
+          book.createdAt,
+        ],
+      ],
+    },
+  })
+}
