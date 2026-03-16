@@ -82,6 +82,10 @@ describe('fetchBookMetadata', () => {
     const result = await fetchBookMetadata(TEST_ISBN)
 
     expect(result).toMatchObject({
+      isbn13: '9784873115658',
+      title: 'リーダブルコード',
+      author: 'Dustin Boswell',
+      publisher: 'オライリージャパン',
       ndc: '007.64',
     })
   })
