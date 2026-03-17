@@ -8,6 +8,9 @@ export async function fetchBookMetadata(
 
   if (openbd) {
     let thumbnailUrl = openbd.cover || null
+    if (thumbnailUrl) {
+      thumbnailUrl = (await isUrlReachable(thumbnailUrl)) ? thumbnailUrl : null
+    }
     if (!thumbnailUrl) {
       const googleBooks = await fetchFromGoogleBooks(isbn13)
       thumbnailUrl = googleBooks?.imageLinks?.thumbnail ?? null
@@ -74,6 +77,15 @@ async function fetchFromGoogleBooks(isbn13: string) {
     }
   } catch {
     return null
+  }
+}
+
+async function isUrlReachable(url: string): Promise<boolean> {
+  try {
+    const res = await fetch(url, { method: 'HEAD' })
+    return res.ok
+  } catch {
+    return false
   }
 }
 
