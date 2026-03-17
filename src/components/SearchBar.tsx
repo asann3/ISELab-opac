@@ -1,5 +1,7 @@
 'use client'
 
+import { Input } from '@/components/ui/input'
+
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
@@ -7,7 +9,7 @@ interface SearchBarProps {
 
 export function SearchBar({ value, onChange }: SearchBarProps) {
   return (
-    <input
+    <Input
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
