@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { act } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { BookRecord, ISBN13 } from '@/types/book'
@@ -12,6 +12,7 @@ import { BookCard } from './BookCard'
 // [ ] NDCがnullのときバッジ非表示
 // [ ] 書影がないときno-image.svgが表示される
 // [ ] 書影があるとき画像が表示される
+// [ ] 書影リンク切れ時にno-image.svgにフォールバック
 
 const baseBook: BookRecord = {
   isbn13: '9784873115658' as ISBN13,
@@ -65,5 +66,19 @@ describe('BookCard', () => {
     await act(() => render(<BookCard book={bookWithThumbnail} />))
     const img = screen.getByRole('img')
     expect(img.getAttribute('src')).toBe('https://example.com/cover.jpg')
+  })
+
+  it('書影リンク切れ時にno-image.svgにフォールバック', async () => {
+    const bookWithBrokenUrl = {
+      ...baseBook,
+      thumbnailUrl: 'https://example.com/broken.jpg',
+    }
+    await act(() => render(<BookCard book={bookWithBrokenUrl} />))
+    const img = screen.getByRole('img')
+    expect(img.getAttribute('src')).toBe('https://example.com/broken.jpg')
+    await act(() => {
+      fireEvent.error(img)
+    })
+    expect(img.getAttribute('src')).toContain('no-image')
   })
 })
