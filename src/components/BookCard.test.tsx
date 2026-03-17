@@ -35,4 +35,11 @@ describe('BookCard', () => {
     expect(screen.getByText('Dustin Boswell')).toBeDefined()
     expect(screen.getByText('オライリージャパン')).toBeDefined()
   })
+
+  it('著者がnullのとき非表示', async () => {
+    await act(() =>
+      render(<BookCard book={{ ...baseBook, author: null }} />),
+    )
+    expect(screen.queryByText('Dustin Boswell')).toBeNull()
+  })
 })
