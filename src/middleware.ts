@@ -33,3 +33,4 @@ function isValidAuth(authorization: string): boolean {
   const [, password] = decoded.split(':')
   return password === process.env.BASIC_AUTH_PASSWORD
 }
+
