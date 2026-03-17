@@ -11,7 +11,7 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <div className="group flex gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50">
-      <div className="h-24 w-16 shrink-0 overflow-hidden rounded-sm bg-muted">
+      <div className="h-24 w-16 shrink-0 overflow-hidden rounded-sm bg-muted bg-[url('/no-image.svg')] bg-cover bg-center bg-no-repeat">
         <img
           src={imgSrc}
           alt={book.title}
