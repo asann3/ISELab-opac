@@ -47,4 +47,9 @@ describe('BookCard', () => {
     await act(() => render(<BookCard book={baseBook} />))
     expect(screen.getByText('007.64')).toBeDefined()
   })
+
+  it('NDCがnullのときバッジ非表示', async () => {
+    await act(() => render(<BookCard book={{ ...baseBook, ndc: null }} />))
+    expect(screen.queryByText('007.64')).toBeNull()
+  })
 })
