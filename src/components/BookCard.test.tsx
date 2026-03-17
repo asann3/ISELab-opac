@@ -42,4 +42,9 @@ describe('BookCard', () => {
     )
     expect(screen.queryByText('Dustin Boswell')).toBeNull()
   })
+
+  it('NDCバッジが表示される', async () => {
+    await act(() => render(<BookCard book={baseBook} />))
+    expect(screen.getByText('007.64')).toBeDefined()
+  })
 })
