@@ -58,4 +58,14 @@ describe('BookCard', () => {
     const img = screen.getByRole('img')
     expect(img.getAttribute('src')).toContain('no-image')
   })
+
+  it('書影があるとき画像が表示される', async () => {
+    const bookWithThumbnail = {
+      ...baseBook,
+      thumbnailUrl: 'https://example.com/cover.jpg',
+    }
+    await act(() => render(<BookCard book={bookWithThumbnail} />))
+    const img = screen.getByRole('img')
+    expect(img.getAttribute('src')).toBe('https://example.com/cover.jpg')
+  })
 })
