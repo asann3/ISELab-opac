@@ -16,4 +16,12 @@ describe('SearchBar', () => {
     await act(() => render(<SearchBar value="" onChange={() => {}} />))
     expect(screen.getByRole('textbox')).toBeDefined()
   })
+
+  it('入力値が変わるとonChangeが呼ばれる', async () => {
+    const onChange = vi.fn()
+    await act(() => render(<SearchBar value="" onChange={onChange} />))
+    const input = screen.getByRole('textbox')
+    await userEvent.type(input, 'リーダブル')
+    expect(onChange).toHaveBeenCalledWith('リ')
+  })
 })
