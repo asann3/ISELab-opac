@@ -7,6 +7,7 @@ import type { ISBN13 } from '@/types/book'
 // [ ] OpenBD失敗時にGoogle Booksにフォールバックする
 // [ ] 全API失敗時にnullを返す
 // [ ] OpenBDとNDLの結果をマージして返す
+// [ ] 書影URLが404の場合にnullとして保存する
 
 import { fetchBookMetadata } from './bookMetadata'
 
@@ -171,6 +172,38 @@ describe('fetchBookMetadata', () => {
     expect(result).toMatchObject({
       title: 'リーダブルコード',
       thumbnailUrl: 'https://books.google.com/thumb.jpg',
+    })
+  })
+
+  it('書影URLが404の場合にnullとして保存する', async () => {
+    const mockFetch = vi.mocked(fetch)
+    mockFetch.mockImplementation(async (url, options) => {
+      const urlStr = url.toString()
+      if (options?.method === 'HEAD') {
+        return new Response('', { status: 404 })
+      }
+      if (urlStr.includes('openbd')) {
+        return new Response(
+          JSON.stringify([
+            {
+              summary: {
+                title: 'リーダブルコード',
+                author: 'Dustin Boswell',
+                publisher: 'オライリージャパン',
+                cover: 'https://cover.openbd.jp/9784873115658.jpg',
+              },
+            },
+          ]),
+        )
+      }
+      return new Response('', { status: 404 })
+    })
+
+    const result = await fetchBookMetadata(TEST_ISBN)
+
+    expect(result).toMatchObject({
+      title: 'リーダブルコード',
+      thumbnailUrl: null,
     })
   })
 
