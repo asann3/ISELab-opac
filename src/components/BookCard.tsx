@@ -5,5 +5,11 @@ interface BookCardProps {
 }
 
 export function BookCard({ book }: BookCardProps) {
-  return <div>{book.title}</div>
+  return (
+    <div>
+      <div>{book.title}</div>
+      {book.author && <div>{book.author}</div>}
+      {book.publisher && <div>{book.publisher}</div>}
+    </div>
+  )
 }

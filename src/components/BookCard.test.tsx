@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { act } from 'react'
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { BookCard } from './BookCard'
 import type { BookRecord, ISBN13 } from '@/types/book'
 
@@ -24,6 +24,7 @@ const baseBook: BookRecord = {
 }
 
 describe('BookCard', () => {
+  afterEach(cleanup)
   it('タイトルが表示される', async () => {
     await act(() => render(<BookCard book={baseBook} />))
     expect(screen.getByText('リーダブルコード')).toBeDefined()
