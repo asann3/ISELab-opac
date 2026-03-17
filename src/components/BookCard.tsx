@@ -10,6 +10,7 @@ export function BookCard({ book }: BookCardProps) {
       <div>{book.title}</div>
       {book.author && <div>{book.author}</div>}
       {book.publisher && <div>{book.publisher}</div>}
+      {book.ndc && <span>{book.ndc}</span>}
     </div>
   )
 }
