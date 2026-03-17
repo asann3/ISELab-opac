@@ -1,5 +1,6 @@
 'use client'
 
+import { Badge } from '@/components/ui/badge'
 import type { BookRecord } from '@/types/book'
 
 interface BookCardProps {
@@ -40,9 +41,9 @@ export function BookCard({ book }: BookCardProps) {
           </div>
         )}
         {book.ndc && (
-          <span className="mt-1 inline-flex w-fit items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground">
+          <Badge variant="secondary" className="mt-1 text-[10px]">
             {book.ndc}
-          </span>
+          </Badge>
         )}
       </div>
     </div>
