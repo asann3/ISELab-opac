@@ -24,4 +24,9 @@ describe('SearchBar', () => {
     await userEvent.type(input, 'リーダブル')
     expect(onChange).toHaveBeenCalledWith('リ')
   })
+
+  it('プレースホルダーが表示される', async () => {
+    await act(() => render(<SearchBar value="" onChange={() => {}} />))
+    expect(screen.getByPlaceholderText('タイトル・著者名で検索')).toBeDefined()
+  })
 })
