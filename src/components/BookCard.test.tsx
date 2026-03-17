@@ -1,8 +1,8 @@
-import { describe, it, expect, afterEach } from 'vitest'
-import { act } from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
-import { BookCard } from './BookCard'
+import { act } from 'react'
+import { afterEach, describe, expect, it } from 'vitest'
 import type { BookRecord, ISBN13 } from '@/types/book'
+import { BookCard } from './BookCard'
 
 // テストリスト: BookCard
 // [ ] タイトルが表示される
@@ -37,9 +37,7 @@ describe('BookCard', () => {
   })
 
   it('著者がnullのとき非表示', async () => {
-    await act(() =>
-      render(<BookCard book={{ ...baseBook, author: null }} />),
-    )
+    await act(() => render(<BookCard book={{ ...baseBook, author: null }} />))
     expect(screen.queryByText('Dustin Boswell')).toBeNull()
   })
 
