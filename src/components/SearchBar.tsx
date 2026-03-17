@@ -11,6 +11,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      placeholder="タイトル・著者名で検索"
     />
   )
 }
