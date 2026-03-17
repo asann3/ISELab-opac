@@ -1,3 +1,5 @@
+'use client'
+
 import type { BookRecord } from '@/types/book'
 
 interface BookCardProps {
@@ -14,6 +16,9 @@ export function BookCard({ book }: BookCardProps) {
           src={imgSrc}
           alt={book.title}
           className="h-full w-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = '/no-image.svg'
+          }}
         />
       </div>
       <div className="flex min-w-0 flex-col gap-1">
