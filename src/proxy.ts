@@ -9,7 +9,7 @@ function requiresAuth(request: NextRequest): boolean {
   return false
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (!requiresAuth(request)) {
     return NextResponse.next()
   }
@@ -33,4 +33,3 @@ function isValidAuth(authorization: string): boolean {
   const [, password] = decoded.split(':')
   return password === process.env.BASIC_AUTH_PASSWORD
 }
-

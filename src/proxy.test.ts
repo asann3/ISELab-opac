@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// テストリスト: middleware.ts (Basic認証)
+// テストリスト: proxy.ts (Basic認証)
 // [ ] GET /api/books は認証なしで通過する
 // [ ] POST /api/books に認証なしで401を返す
 // [ ] POST /api/books に正しい認証で通過する
@@ -31,73 +31,73 @@ function basicAuth(password: string) {
   return `Basic ${btoa(`admin:${password}`)}`
 }
 
-describe('middleware', () => {
+describe('proxy', () => {
   beforeEach(() => {
     vi.stubEnv('BASIC_AUTH_PASSWORD', TEST_PASSWORD)
   })
 
   it('GET /api/books は認証なしで通過する', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/api/books')
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).not.toBe(401)
   })
 
   it('POST /api/books に認証なしで401を返す', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/api/books', { method: 'POST' })
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).toBe(401)
     expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
   })
 
   it('POST /api/books に正しい認証で通過する', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/api/books', {
       method: 'POST',
       authorization: basicAuth(TEST_PASSWORD),
     })
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).not.toBe(401)
   })
 
   it('POST /api/books に不正な認証で401を返す', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/api/books', {
       method: 'POST',
       authorization: basicAuth('wrong-password'),
     })
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).toBe(401)
   })
 
   it('/register に認証なしで401を返す', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/register')
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).toBe(401)
     expect(response.headers.get('WWW-Authenticate')).toBe('Basic')
   })
 
   it('/register に正しい認証で通過する', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/register', {
       authorization: basicAuth(TEST_PASSWORD),
     })
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).not.toBe(401)
   })
 
   it('静的ファイルは認証不要で通過する', async () => {
-    const { middleware } = await import('./middleware')
+    const { proxy } = await import('./proxy')
     const request = createRequest('/_next/static/chunk.js')
-    const response = middleware(request)
+    const response = proxy(request)
 
     expect(response.status).not.toBe(401)
   })
