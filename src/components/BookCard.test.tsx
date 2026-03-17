@@ -52,4 +52,10 @@ describe('BookCard', () => {
     await act(() => render(<BookCard book={{ ...baseBook, ndc: null }} />))
     expect(screen.queryByText('007.64')).toBeNull()
   })
+
+  it('書影がないときno-image.svgが表示される', async () => {
+    await act(() => render(<BookCard book={baseBook} />))
+    const img = screen.getByRole('img')
+    expect(img.getAttribute('src')).toContain('no-image')
+  })
 })
