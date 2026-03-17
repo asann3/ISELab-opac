@@ -28,4 +28,10 @@ describe('BookCard', () => {
     await act(() => render(<BookCard book={baseBook} />))
     expect(screen.getByText('リーダブルコード')).toBeDefined()
   })
+
+  it('著者・出版社が表示される', async () => {
+    await act(() => render(<BookCard book={baseBook} />))
+    expect(screen.getByText('Dustin Boswell')).toBeDefined()
+    expect(screen.getByText('オライリージャパン')).toBeDefined()
+  })
 })
