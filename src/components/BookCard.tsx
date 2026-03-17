@@ -16,8 +16,12 @@ export function BookCard({ book }: BookCardProps) {
           src={imgSrc}
           alt={book.title}
           className="h-full w-full object-cover"
+          style={{ opacity: 0 }}
+          onLoad={(e) => {
+            e.currentTarget.style.opacity = '1'
+          }}
           onError={(e) => {
-            e.currentTarget.src = '/no-image.svg'
+            e.currentTarget.style.display = 'none'
           }}
         />
       </div>

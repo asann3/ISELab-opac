@@ -68,17 +68,16 @@ describe('BookCard', () => {
     expect(img.getAttribute('src')).toBe('https://example.com/cover.jpg')
   })
 
-  it('書影リンク切れ時にno-image.svgにフォールバック', async () => {
+  it('書影リンク切れ時にimgが非表示になる', async () => {
     const bookWithBrokenUrl = {
       ...baseBook,
       thumbnailUrl: 'https://example.com/broken.jpg',
     }
     await act(() => render(<BookCard book={bookWithBrokenUrl} />))
     const img = screen.getByRole('img')
-    expect(img.getAttribute('src')).toBe('https://example.com/broken.jpg')
     await act(() => {
       fireEvent.error(img)
     })
-    expect(img.getAttribute('src')).toContain('no-image')
+    expect(img.style.display).toBe('none')
   })
 })
