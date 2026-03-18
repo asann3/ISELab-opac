@@ -6,8 +6,9 @@
 // [ ] 選択中のNDCがハイライトされる
 
 import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { act } from 'react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { NdcFilter } from './NdcFilter'
 
 describe('NdcFilter', () => {
@@ -30,5 +31,16 @@ describe('NdcFilter', () => {
     )
     expect(screen.getByText('007 情報科学')).toBeDefined()
     expect(screen.getByText('547 通信工学．電気通信')).toBeDefined()
+  })
+
+  it('選択肢をクリックするとonChangeが呼ばれる', async () => {
+    const onChange = vi.fn()
+    await act(() =>
+      render(
+        <NdcFilter ndcList={['007', '547']} selected={null} onChange={onChange} />,
+      ),
+    )
+    await userEvent.click(screen.getByText('007 情報科学'))
+    expect(onChange).toHaveBeenCalledWith('007')
   })
 })
