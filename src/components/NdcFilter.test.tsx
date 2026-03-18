@@ -1,9 +1,9 @@
 // テストリスト: NdcFilter
-// [ ] 「すべて」ボタンが表示される
-// [ ] NDCコードとラベルの選択肢が表示される
-// [ ] 選択肢をクリックするとonChangeが呼ばれる
-// [ ] 「すべて」をクリックするとonChangeがnullで呼ばれる
-// [ ] 選択中のNDCがハイライトされる
+// [x] 「すべて」ボタンが表示される
+// [x] NDCコードとラベルの選択肢が表示される
+// [x] 選択肢をクリックするとonChangeが呼ばれる
+// [x] 「すべて」をクリックするとonChangeがnullで呼ばれる
+// [x] 選択中のNDCがハイライトされる
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
