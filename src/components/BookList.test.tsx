@@ -58,4 +58,11 @@ describe('BookList', () => {
     expect(screen.getByText('プログラミング言語C')).toBeDefined()
     expect(screen.queryByText('リーダブルコード')).toBeNull()
   })
+
+  it('NdcFilterで分類を選択するとNDCでフィルタリングされる', async () => {
+    await act(() => render(<BookList books={books} />))
+    await userEvent.click(screen.getByText('007 情報科学'))
+    expect(screen.getByText('リーダブルコード')).toBeDefined()
+    expect(screen.queryByText('プログラミング言語C')).toBeNull()
+  })
 })
