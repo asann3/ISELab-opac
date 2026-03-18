@@ -44,6 +44,7 @@ export function BookList({ books }: BookListProps) {
   return (
     <div>
       <SearchBar value={query} onChange={setQuery} />
+      <div className="mt-3" />
       <NdcFilter
         ndcList={ndcList}
         selected={selectedNdc}

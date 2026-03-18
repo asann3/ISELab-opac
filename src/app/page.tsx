@@ -1,4 +1,4 @@
-import { BookCard } from '@/components/BookCard'
+import { BookList } from '@/components/BookList'
 import type { BookRecord, ISBN13 } from '@/types/book'
 
 export const metadata = {
@@ -39,11 +39,7 @@ export default function Page() {
   return (
     <main className="mx-auto max-w-2xl p-4">
       <h1 className="mb-6 text-xl font-bold">ISE Lab OPAC</h1>
-      <div className="mt-4 flex flex-col gap-3">
-        {dummyBooks.map((book) => (
-          <BookCard key={book.isbn13} book={book} />
-        ))}
-      </div>
+      <BookList books={dummyBooks} />
     </main>
   )
 }
