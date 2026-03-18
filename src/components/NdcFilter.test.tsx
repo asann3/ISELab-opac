@@ -17,7 +17,11 @@ describe('NdcFilter', () => {
   it('「すべて」ボタンが表示される', async () => {
     await act(() =>
       render(
-        <NdcFilter ndcList={['007', '547']} selected={null} onChange={() => {}} />,
+        <NdcFilter
+          ndcList={['007', '547']}
+          selected={null}
+          onChange={() => {}}
+        />,
       ),
     )
     expect(screen.getByText('すべて')).toBeDefined()
@@ -26,7 +30,11 @@ describe('NdcFilter', () => {
   it('NDCコードとラベルの選択肢が表示される', async () => {
     await act(() =>
       render(
-        <NdcFilter ndcList={['007', '547']} selected={null} onChange={() => {}} />,
+        <NdcFilter
+          ndcList={['007', '547']}
+          selected={null}
+          onChange={() => {}}
+        />,
       ),
     )
     expect(screen.getByText('007 情報科学')).toBeDefined()
@@ -37,7 +45,11 @@ describe('NdcFilter', () => {
     const onChange = vi.fn()
     await act(() =>
       render(
-        <NdcFilter ndcList={['007', '547']} selected={null} onChange={onChange} />,
+        <NdcFilter
+          ndcList={['007', '547']}
+          selected={null}
+          onChange={onChange}
+        />,
       ),
     )
     await userEvent.click(screen.getByText('007 情報科学'))
@@ -58,7 +70,11 @@ describe('NdcFilter', () => {
   it('選択中のNDCがハイライトされる', async () => {
     await act(() =>
       render(
-        <NdcFilter ndcList={['007', '547']} selected={'007'} onChange={() => {}} />,
+        <NdcFilter
+          ndcList={['007', '547']}
+          selected={'007'}
+          onChange={() => {}}
+        />,
       ),
     )
     const selected = screen.getByText('007 情報科学')
