@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import type { BookRecord } from '@/types/book'
+import { BarcodeScanner } from './BarcodeScanner'
 
 type Phase = 'input' | 'preview' | 'manual'
 
@@ -86,6 +87,11 @@ export function RegisterForm() {
 
   return (
     <div className="flex flex-col gap-4">
+      <BarcodeScanner
+        onScan={(scanned) => {
+          setIsbn(scanned)
+        }}
+      />
       <div className="flex gap-2">
         <Input
           value={isbn}

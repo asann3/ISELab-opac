@@ -22,6 +22,10 @@ vi.mock('sonner', () => ({
   },
 }))
 
+vi.mock('./BarcodeScanner', () => ({
+  BarcodeScanner: () => null,
+}))
+
 const mockBook = {
   isbn13: '9784873115658',
   title: 'リーダブルコード',
