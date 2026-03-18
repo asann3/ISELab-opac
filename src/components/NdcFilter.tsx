@@ -11,7 +11,7 @@ type NdcFilterProps = {
 export function NdcFilter({ ndcList, selected, onChange }: NdcFilterProps) {
   return (
     <div>
-      <button type="button">すべて</button>
+      <button type="button" onClick={() => onChange(null)}>すべて</button>
       {ndcList.map((ndc) => (
         <button key={ndc} type="button" onClick={() => onChange(ndc)}>
           {ndc} {getNdcLabel(ndc)}
