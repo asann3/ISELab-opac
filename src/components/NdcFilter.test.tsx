@@ -43,4 +43,15 @@ describe('NdcFilter', () => {
     await userEvent.click(screen.getByText('007 情報科学'))
     expect(onChange).toHaveBeenCalledWith('007')
   })
+
+  it('「すべて」をクリックするとonChangeがnullで呼ばれる', async () => {
+    const onChange = vi.fn()
+    await act(() =>
+      render(
+        <NdcFilter ndcList={['007']} selected={'007'} onChange={onChange} />,
+      ),
+    )
+    await userEvent.click(screen.getByText('すべて'))
+    expect(onChange).toHaveBeenCalledWith(null)
+  })
 })
