@@ -1,5 +1,7 @@
 'use client'
 
+import { getNdcLabel } from '@/lib/ndc'
+
 type NdcFilterProps = {
   ndcList: string[]
   selected: string | null
@@ -10,6 +12,11 @@ export function NdcFilter({ ndcList, selected, onChange }: NdcFilterProps) {
   return (
     <div>
       <button type="button">すべて</button>
+      {ndcList.map((ndc) => (
+        <button key={ndc} type="button">
+          {ndc} {getNdcLabel(ndc)}
+        </button>
+      ))}
     </div>
   )
 }

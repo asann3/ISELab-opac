@@ -29,6 +29,6 @@ describe('NdcFilter', () => {
       ),
     )
     expect(screen.getByText('007 情報科学')).toBeDefined()
-    expect(screen.getByText('547 通信工学.電気通信')).toBeDefined()
+    expect(screen.getByText('547 通信工学．電気通信')).toBeDefined()
   })
 })
