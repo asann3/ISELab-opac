@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import type { BookRecord } from '@/types/book'
@@ -85,13 +85,13 @@ export function RegisterForm() {
     }
   }
 
+  const handleScan = useCallback((scanned: string) => {
+    setIsbn(scanned)
+  }, [])
+
   return (
     <div className="flex flex-col gap-4">
-      <BarcodeScanner
-        onScan={(scanned) => {
-          setIsbn(scanned)
-        }}
-      />
+      <BarcodeScanner onScan={handleScan} />
       <div className="flex gap-2">
         <Input
           value={isbn}
