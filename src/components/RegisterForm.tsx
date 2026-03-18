@@ -12,9 +12,15 @@ export function RegisterForm() {
   const [book, setBook] = useState<BookRecord | null>(null)
   const [phase, setPhase] = useState<Phase>('input')
   const [loading, setLoading] = useState(false)
+  const [manualIsbn, setManualIsbn] = useState('')
   const [manualTitle, setManualTitle] = useState('')
   const [manualAuthor, setManualAuthor] = useState('')
   const [manualPublisher, setManualPublisher] = useState('')
+
+  function switchToManual() {
+    setManualIsbn(isbn)
+    setPhase('manual')
+  }
 
   async function handleSearch() {
     if (!isbn) return
@@ -29,13 +35,13 @@ export function RegisterForm() {
           setBook(data.book)
           setPhase('preview')
         } else {
-          setPhase('manual')
+          switchToManual()
         }
       } else {
-        setPhase('manual')
+        switchToManual()
       }
     } catch {
-      setPhase('manual')
+      switchToManual()
     } finally {
       setLoading(false)
     }
@@ -43,7 +49,7 @@ export function RegisterForm() {
 
   async function handleRegister() {
     const payload = book ?? {
-      isbn13: isbn,
+      isbn13: manualIsbn,
       title: manualTitle,
       author: manualAuthor || null,
       publisher: manualPublisher || null,
@@ -129,6 +135,11 @@ export function RegisterForm() {
           <p className="text-sm text-muted-foreground">
             書誌情報が取得できませんでした。手入力してください。
           </p>
+          <Input
+            value={manualIsbn}
+            onChange={(e) => setManualIsbn(e.target.value)}
+            placeholder="ISBN"
+          />
           <Input
             value={manualTitle}
             onChange={(e) => setManualTitle(e.target.value)}
