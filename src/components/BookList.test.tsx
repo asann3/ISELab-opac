@@ -4,7 +4,7 @@
 // [x] SearchBarに入力すると著者名でもフィルタリングされる
 // [x] NdcFilterで分類を選択するとNDCでフィルタリングされる
 // [x] NdcFilterで「すべて」を選択するとフィルタが解除される
-// [ ] テキスト検索とNDCフィルタを組み合わせて絞り込める
+// [x] テキスト検索とNDCフィルタを組み合わせて絞り込める
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
