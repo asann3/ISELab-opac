@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import type { BookRecord } from '@/types/book'
 import { normalizeNdc } from '@/lib/ndc'
+import type { BookRecord } from '@/types/book'
 import { BookCard } from './BookCard'
 import { NdcFilter } from './NdcFilter'
 import { SearchBar } from './SearchBar'
