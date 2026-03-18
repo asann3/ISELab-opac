@@ -50,4 +50,12 @@ describe('BookList', () => {
     expect(screen.getByText('リーダブルコード')).toBeDefined()
     expect(screen.queryByText('プログラミング言語C')).toBeNull()
   })
+
+  it('SearchBarに入力すると著者名でもフィルタリングされる', async () => {
+    await act(() => render(<BookList books={books} />))
+    const input = screen.getByPlaceholderText('タイトル・著者名で検索')
+    await userEvent.type(input, 'カーニハン')
+    expect(screen.getByText('プログラミング言語C')).toBeDefined()
+    expect(screen.queryByText('リーダブルコード')).toBeNull()
+  })
 })
