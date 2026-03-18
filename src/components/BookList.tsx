@@ -15,7 +15,10 @@ export function BookList({ books }: BookListProps) {
   const filtered = books.filter((book) => {
     if (!query) return true
     const q = query.toLowerCase()
-    return book.title.toLowerCase().includes(q)
+    return (
+      book.title.toLowerCase().includes(q) ||
+      (book.author?.toLowerCase().includes(q) ?? false)
+    )
   })
 
   return (
