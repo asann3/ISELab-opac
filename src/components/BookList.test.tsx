@@ -1,9 +1,9 @@
 // テストリスト: BookList
-// [ ] 書籍一覧が表示される
-// [ ] SearchBarに入力するとタイトルでフィルタリングされる
-// [ ] SearchBarに入力すると著者名でもフィルタリングされる
-// [ ] NdcFilterで分類を選択するとNDCでフィルタリングされる
-// [ ] NdcFilterで「すべて」を選択するとフィルタが解除される
+// [x] 書籍一覧が表示される
+// [x] SearchBarに入力するとタイトルでフィルタリングされる
+// [x] SearchBarに入力すると著者名でもフィルタリングされる
+// [x] NdcFilterで分類を選択するとNDCでフィルタリングされる
+// [x] NdcFilterで「すべて」を選択するとフィルタが解除される
 // [ ] テキスト検索とNDCフィルタを組み合わせて絞り込める
 
 import { cleanup, render, screen } from '@testing-library/react'
@@ -73,5 +73,29 @@ describe('BookList', () => {
     await userEvent.click(screen.getByText('すべて'))
     expect(screen.getByText('リーダブルコード')).toBeDefined()
     expect(screen.getByText('プログラミング言語C')).toBeDefined()
+  })
+
+  it('テキスト検索とNDCフィルタを組み合わせて絞り込める', async () => {
+    const books3: BookRecord[] = [
+      ...books,
+      {
+        isbn13: '9784873119038' as ISBN13,
+        title: 'Pythonではじめる機械学習',
+        author: 'Andreas Müller',
+        publisher: 'オライリージャパン',
+        ndc: '007.13',
+        thumbnailUrl: null,
+        createdAt: '2025-01-03T00:00:00.000Z',
+      },
+    ]
+    await act(() => render(<BookList books={books3} />))
+    // NDC 007 でフィルタ → リーダブルコード・Python本が残る
+    await userEvent.click(screen.getByText('007 情報科学'))
+    // さらにタイトルで絞り込む
+    const input = screen.getByPlaceholderText('タイトル・著者名で検索')
+    await userEvent.type(input, 'Python')
+    expect(screen.getByText('Pythonではじめる機械学習')).toBeDefined()
+    expect(screen.queryByText('リーダブルコード')).toBeNull()
+    expect(screen.queryByText('プログラミング言語C')).toBeNull()
   })
 })
