@@ -14,6 +14,32 @@ export function BarcodeScanner({ onScan }: BarcodeScannerProps) {
   const containerId = 'barcode-scanner'
   const [cameraState, setCameraState] = useState<CameraState>('starting')
   const [retryKey, setRetryKey] = useState(0)
+  const [lineTop, setLineTop] = useState<number | null>(null)
+
+  // video要素の位置を監視して赤線をビデオ中央に追従させる
+  useEffect(() => {
+    if (cameraState !== 'active') return
+    const container = document.getElementById(containerId)
+    if (!container) return
+
+    const updateLine = () => {
+      const video = container.querySelector('video')
+      if (!video) return
+      // html5-qrcodeのインラインスタイルを上書きして右側の白帯を消す
+      video.style.width = '100%'
+      video.style.height = 'auto'
+      const containerRect = container.getBoundingClientRect()
+      const videoRect = video.getBoundingClientRect()
+      setLineTop(videoRect.top - containerRect.top + videoRect.height / 2)
+    }
+
+    const observer = new ResizeObserver(updateLine)
+    const video = container.querySelector('video')
+    if (video) observer.observe(video)
+    updateLine()
+
+    return () => observer.disconnect()
+  }, [cameraState])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: retryKey is intentionally used as a re-run trigger
   useEffect(() => {
@@ -27,7 +53,7 @@ export function BarcodeScanner({ onScan }: BarcodeScannerProps) {
     scanner
       .start(
         { facingMode: 'environment' },
-        { fps: 4, qrbox: { width: 300, height: 100 } },
+        { fps: 4, qrbox: { width: 220, height: 70 } },
         (decodedText) => {
           onScan(decodedText)
         },
@@ -57,10 +83,11 @@ export function BarcodeScanner({ onScan }: BarcodeScannerProps) {
   return (
     <div className="relative">
       <div id={containerId} className="overflow-hidden rounded-lg" />
-      {cameraState === 'active' && (
-        <div className="pointer-events-none absolute inset-0 flex items-center">
-          <div className="h-0.5 w-full bg-red-500/60" />
-        </div>
+      {cameraState === 'active' && lineTop !== null && (
+        <div
+          className="pointer-events-none absolute left-0 right-0 h-0.5 bg-red-500/60"
+          style={{ top: lineTop }}
+        />
       )}
       {cameraState === 'denied' && (
         <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-4 text-center text-sm text-muted-foreground">

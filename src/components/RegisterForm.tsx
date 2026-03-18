@@ -18,17 +18,12 @@ export function RegisterForm() {
   const [manualAuthor, setManualAuthor] = useState('')
   const [manualPublisher, setManualPublisher] = useState('')
 
-  function switchToManual() {
-    setManualIsbn(isbn)
-    setPhase('manual')
-  }
-
-  async function handleSearch() {
-    if (!isbn) return
+  const searchByIsbn = useCallback(async (isbnValue: string) => {
+    if (!isbnValue) return
     setLoading(true)
     try {
       const res = await fetch(
-        `/api/books/metadata?isbn=${encodeURIComponent(isbn)}`,
+        `/api/books/metadata?isbn=${encodeURIComponent(isbnValue)}`,
       )
       if (res.ok) {
         const data = await res.json()
@@ -36,16 +31,36 @@ export function RegisterForm() {
           setBook(data.book)
           setPhase('preview')
         } else {
-          switchToManual()
+          setManualIsbn(isbnValue)
+          setPhase('manual')
         }
       } else {
-        switchToManual()
+        setManualIsbn(isbnValue)
+        setPhase('manual')
       }
     } catch {
-      switchToManual()
+      setManualIsbn(isbnValue)
+      setPhase('manual')
     } finally {
       setLoading(false)
     }
+  }, [])
+
+  const handleScan = useCallback(
+    (scanned: string) => {
+      setIsbn(scanned)
+      void searchByIsbn(scanned)
+    },
+    [searchByIsbn],
+  )
+
+  function handleSearch() {
+    void searchByIsbn(isbn)
+  }
+
+  function resetToInput() {
+    setBook(null)
+    setPhase('input')
   }
 
   async function handleRegister() {
@@ -93,51 +108,68 @@ export function RegisterForm() {
     }
   }
 
-  const handleScan = useCallback((scanned: string) => {
-    setIsbn(scanned)
-  }, [])
-
   return (
-    <div className="flex flex-col gap-4">
-      <BarcodeScanner onScan={handleScan} />
-      <div className="flex gap-2">
-        <Input
-          value={isbn}
-          onChange={(e) => setIsbn(e.target.value)}
-          placeholder="ISBNを入力"
-        />
-        <button
-          type="button"
-          onClick={handleSearch}
-          disabled={loading}
-          className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
-        >
-          {loading ? '検索中…' : '検索'}
-        </button>
-      </div>
+    <div className="flex flex-col gap-3">
+      {phase === 'input' && (
+        <>
+          <BarcodeScanner onScan={handleScan} />
+          <div className="flex gap-2">
+            <Input
+              value={isbn}
+              onChange={(e) => setIsbn(e.target.value)}
+              placeholder="ISBNを入力"
+            />
+            <button
+              type="button"
+              onClick={handleSearch}
+              disabled={loading}
+              className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+            >
+              {loading ? '検索中…' : '検索'}
+            </button>
+          </div>
+        </>
+      )}
+
+      {loading && phase !== 'input' && (
+        <p className="text-center text-sm text-muted-foreground">検索中…</p>
+      )}
 
       {phase === 'preview' && book && (
-        <div className="flex flex-col gap-2 rounded-lg border p-4">
-          <div className="font-semibold">{book.title}</div>
-          {book.author && (
-            <div className="text-sm text-muted-foreground">{book.author}</div>
-          )}
-          {book.publisher && (
-            <div className="text-sm text-muted-foreground">
-              {book.publisher}
+        <div className="flex flex-col gap-3 rounded-lg border p-4">
+          <button
+            type="button"
+            onClick={resetToInput}
+            className="self-start text-xs text-muted-foreground underline"
+          >
+            ← もう一度スキャン
+          </button>
+          <div className="flex gap-3">
+            {book.thumbnailUrl && (
+              <img
+                src={book.thumbnailUrl}
+                alt={book.title}
+                className="h-24 w-16 flex-shrink-0 rounded object-cover shadow"
+              />
+            )}
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="font-semibold leading-snug">{book.title}</div>
+              {book.author && (
+                <div className="text-sm text-muted-foreground">
+                  {book.author}
+                </div>
+              )}
+              {book.publisher && (
+                <div className="text-sm text-muted-foreground">
+                  {book.publisher}
+                </div>
+              )}
             </div>
-          )}
-          {book.thumbnailUrl && (
-            <img
-              src={book.thumbnailUrl}
-              alt={book.title}
-              className="h-24 w-16 object-cover"
-            />
-          )}
+          </div>
           <button
             type="button"
             onClick={handleRegister}
-            className="mt-2 rounded-md bg-foreground px-4 py-2 text-sm text-background"
+            className="rounded-md bg-foreground px-4 py-2 text-sm text-background"
           >
             登録
           </button>
@@ -146,6 +178,13 @@ export function RegisterForm() {
 
       {phase === 'manual' && (
         <div className="flex flex-col gap-2 rounded-lg border p-4">
+          <button
+            type="button"
+            onClick={resetToInput}
+            className="self-start text-xs text-muted-foreground underline"
+          >
+            ← もう一度スキャン
+          </button>
           <p className="text-sm text-muted-foreground">
             書誌情報が取得できませんでした。手入力してください。
           </p>
@@ -172,7 +211,7 @@ export function RegisterForm() {
           <button
             type="button"
             onClick={handleRegister}
-            className="mt-2 rounded-md bg-foreground px-4 py-2 text-sm text-background"
+            className="mt-1 rounded-md bg-foreground px-4 py-2 text-sm text-background"
           >
             登録
           </button>

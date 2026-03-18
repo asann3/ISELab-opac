@@ -115,6 +115,15 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* html5-qrcode: video を横幅いっぱいに表示して右側の白帯を消す */
+/* html5-qrcode がインラインスタイルで width を設定するため !important が必要 */
+#barcode-scanner video {
+  /* biome-ignore lint/complexity/noImportantStyles: html5-qrcode sets inline styles that require !important to override */
+  width: 100% !important;
+  /* biome-ignore lint/complexity/noImportantStyles: html5-qrcode sets inline styles that require !important to override */
+  height: auto !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
