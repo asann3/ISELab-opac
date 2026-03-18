@@ -54,4 +54,16 @@ describe('NdcFilter', () => {
     await userEvent.click(screen.getByText('すべて'))
     expect(onChange).toHaveBeenCalledWith(null)
   })
+
+  it('選択中のNDCがハイライトされる', async () => {
+    await act(() =>
+      render(
+        <NdcFilter ndcList={['007', '547']} selected={'007'} onChange={() => {}} />,
+      ),
+    )
+    const selected = screen.getByText('007 情報科学')
+    const unselected = screen.getByText('547 通信工学．電気通信')
+    expect(selected.getAttribute('aria-pressed')).toBe('true')
+    expect(unselected.getAttribute('aria-pressed')).toBe('false')
+  })
 })
