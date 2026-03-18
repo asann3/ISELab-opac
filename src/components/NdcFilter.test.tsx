@@ -21,4 +21,14 @@ describe('NdcFilter', () => {
     )
     expect(screen.getByText('すべて')).toBeDefined()
   })
+
+  it('NDCコードとラベルの選択肢が表示される', async () => {
+    await act(() =>
+      render(
+        <NdcFilter ndcList={['007', '547']} selected={null} onChange={() => {}} />,
+      ),
+    )
+    expect(screen.getByText('007 情報科学')).toBeDefined()
+    expect(screen.getByText('547 通信工学.電気通信')).toBeDefined()
+  })
 })
