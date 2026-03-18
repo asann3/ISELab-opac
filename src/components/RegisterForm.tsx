@@ -20,7 +20,9 @@ export function RegisterForm() {
     if (!isbn) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/books/metadata?isbn=${encodeURIComponent(isbn)}`)
+      const res = await fetch(
+        `/api/books/metadata?isbn=${encodeURIComponent(isbn)}`,
+      )
       if (res.ok) {
         const data = await res.json()
         if (data.book) {
@@ -97,10 +99,20 @@ export function RegisterForm() {
       {phase === 'preview' && book && (
         <div className="flex flex-col gap-2 rounded-lg border p-4">
           <div className="font-semibold">{book.title}</div>
-          {book.author && <div className="text-sm text-muted-foreground">{book.author}</div>}
-          {book.publisher && <div className="text-sm text-muted-foreground">{book.publisher}</div>}
+          {book.author && (
+            <div className="text-sm text-muted-foreground">{book.author}</div>
+          )}
+          {book.publisher && (
+            <div className="text-sm text-muted-foreground">
+              {book.publisher}
+            </div>
+          )}
           {book.thumbnailUrl && (
-            <img src={book.thumbnailUrl} alt={book.title} className="h-24 w-16 object-cover" />
+            <img
+              src={book.thumbnailUrl}
+              alt={book.title}
+              className="h-24 w-16 object-cover"
+            />
           )}
           <button
             type="button"
@@ -114,10 +126,24 @@ export function RegisterForm() {
 
       {phase === 'manual' && (
         <div className="flex flex-col gap-2 rounded-lg border p-4">
-          <p className="text-sm text-muted-foreground">書誌情報が取得できませんでした。手入力してください。</p>
-          <Input value={manualTitle} onChange={(e) => setManualTitle(e.target.value)} placeholder="タイトル" />
-          <Input value={manualAuthor} onChange={(e) => setManualAuthor(e.target.value)} placeholder="著者名" />
-          <Input value={manualPublisher} onChange={(e) => setManualPublisher(e.target.value)} placeholder="出版社" />
+          <p className="text-sm text-muted-foreground">
+            書誌情報が取得できませんでした。手入力してください。
+          </p>
+          <Input
+            value={manualTitle}
+            onChange={(e) => setManualTitle(e.target.value)}
+            placeholder="タイトル"
+          />
+          <Input
+            value={manualAuthor}
+            onChange={(e) => setManualAuthor(e.target.value)}
+            placeholder="著者名"
+          />
+          <Input
+            value={manualPublisher}
+            onChange={(e) => setManualPublisher(e.target.value)}
+            placeholder="出版社"
+          />
           <button
             type="button"
             onClick={handleRegister}

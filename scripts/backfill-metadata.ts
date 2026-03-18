@@ -13,7 +13,11 @@ const envPath = resolve(process.cwd(), '.env.local')
 for (const line of readFileSync(envPath, 'utf-8').split('\n')) {
   const [key, ...rest] = line.split('=')
   if (key?.trim() && rest.length) {
-    const value = rest.join('=').trim().replace(/^"|"$/g, '').replace(/\\n/g, '\n')
+    const value = rest
+      .join('=')
+      .trim()
+      .replace(/^"|"$/g, '')
+      .replace(/\\n/g, '\n')
     process.env[key.trim()] = value
   }
 }
@@ -43,7 +47,9 @@ async function fetchNdc(isbn: string): Promise<string | null> {
   }
 }
 
-async function fetchOpenBD(isbn: string): Promise<{ publisher: string; thumbnailUrl: string | null } | null> {
+async function fetchOpenBD(
+  isbn: string,
+): Promise<{ publisher: string; thumbnailUrl: string | null } | null> {
   try {
     const res = await fetch(`https://api.openbd.jp/v1/get?isbn=${isbn}`)
     const data = await res.json()
@@ -109,16 +115,29 @@ async function main() {
     }
 
     if (needsPublisher && publisher) {
-      updates.push({ range: `${sheetName}!D${rowIndex}`, values: [[publisher]] })
+      updates.push({
+        range: `${sheetName}!D${rowIndex}`,
+        values: [[publisher]],
+      })
     }
     if (needsNdc && ndc) {
       updates.push({ range: `${sheetName}!E${rowIndex}`, values: [[ndc]] })
     }
     if (needsThumbnail && thumbnailUrl) {
-      updates.push({ range: `${sheetName}!F${rowIndex}`, values: [[thumbnailUrl]] })
+      updates.push({
+        range: `${sheetName}!F${rowIndex}`,
+        values: [[thumbnailUrl]],
+      })
     }
 
-    const filled = [needsNdc && ndc ? `ndc:${ndc}` : null, needsPublisher && publisher ? `pub:${publisher}` : null, needsThumbnail && thumbnailUrl ? 'thumb:ok' : null].filter(Boolean).join(', ') || '取得不可'
+    const filled =
+      [
+        needsNdc && ndc ? `ndc:${ndc}` : null,
+        needsPublisher && publisher ? `pub:${publisher}` : null,
+        needsThumbnail && thumbnailUrl ? 'thumb:ok' : null,
+      ]
+        .filter(Boolean)
+        .join(', ') || '取得不可'
     console.log(`[${i + 1}/${targets.length}] ${isbn} → ${filled}`)
   }
 
