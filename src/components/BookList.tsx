@@ -9,9 +9,10 @@ import { SearchBar } from './SearchBar'
 
 type BookListProps = {
   books: BookRecord[]
+  isStale?: boolean
 }
 
-export function BookList({ books }: BookListProps) {
+export function BookList({ books, isStale = false }: BookListProps) {
   const [query, setQuery] = useState('')
   const [selectedNdc, setSelectedNdc] = useState<string | null>(null)
 
@@ -43,6 +44,14 @@ export function BookList({ books }: BookListProps) {
 
   return (
     <div>
+      {isStale && (
+        <div
+          role="alert"
+          className="mb-3 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground"
+        >
+          表示中のデータは最新でない可能性があります
+        </div>
+      )}
       <SearchBar value={query} onChange={setQuery} />
       <div className="mt-3" />
       <NdcFilter
