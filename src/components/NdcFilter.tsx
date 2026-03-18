@@ -13,7 +13,7 @@ export function NdcFilter({ ndcList, selected, onChange }: NdcFilterProps) {
     <div>
       <button type="button">すべて</button>
       {ndcList.map((ndc) => (
-        <button key={ndc} type="button">
+        <button key={ndc} type="button" onClick={() => onChange(ndc)}>
           {ndc} {getNdcLabel(ndc)}
         </button>
       ))}
