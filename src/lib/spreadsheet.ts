@@ -25,15 +25,23 @@ export async function getAllBooks(): Promise<BookRecord[]> {
     return []
   }
 
-  return rows.slice(1).map((row) => ({
-    isbn13: row[0] as ISBN13,
-    title: row[1],
-    author: row[2] || null,
-    publisher: row[3] || null,
-    ndc: row[4] || null,
-    thumbnailUrl: row[5] || null,
-    createdAt: row[6],
-  }))
+  const seen = new Set<string>()
+  return rows
+    .slice(1)
+    .filter((row) => {
+      if (!row[0] || seen.has(row[0])) return false
+      seen.add(row[0])
+      return true
+    })
+    .map((row) => ({
+      isbn13: row[0] as ISBN13,
+      title: row[1],
+      author: row[2] || null,
+      publisher: row[3] || null,
+      ndc: row[4] || null,
+      thumbnailUrl: row[5] || null,
+      createdAt: row[6],
+    }))
 }
 
 export class DuplicateIsbnError extends Error {
