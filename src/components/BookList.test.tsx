@@ -7,6 +7,7 @@
 // [ ] テキスト検索とNDCフィルタを組み合わせて絞り込める
 
 import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { act } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { BookRecord, ISBN13 } from '@/types/book'
@@ -40,5 +41,13 @@ describe('BookList', () => {
     await act(() => render(<BookList books={books} />))
     expect(screen.getByText('リーダブルコード')).toBeDefined()
     expect(screen.getByText('プログラミング言語C')).toBeDefined()
+  })
+
+  it('SearchBarに入力するとタイトルでフィルタリングされる', async () => {
+    await act(() => render(<BookList books={books} />))
+    const input = screen.getByPlaceholderText('タイトル・著者名で検索')
+    await userEvent.type(input, 'リーダブル')
+    expect(screen.getByText('リーダブルコード')).toBeDefined()
+    expect(screen.queryByText('プログラミング言語C')).toBeNull()
   })
 })
