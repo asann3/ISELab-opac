@@ -5,7 +5,7 @@
 
 // テストリスト: getNdcLabel
 // [ ] NDCコード "007" のラベル "情報科学" を取得できる
-// [ ] 存在しないNDCコードはundefinedを返す
+// [x] 存在しないNDCコードはundefinedを返す
 
 import { describe, expect, it } from 'vitest'
 import { getNdcLabel, normalizeNdc } from './ndc'
@@ -23,5 +23,9 @@ describe('normalizeNdc', () => {
 describe('getNdcLabel', () => {
   it('NDCコード "007" のラベル "情報科学" を取得できる', () => {
     expect(getNdcLabel('007')).toBe('情報科学')
+  })
+
+  it('存在しないNDCコードはundefinedを返す', () => {
+    expect(getNdcLabel('999')).toBeUndefined()
   })
 })
