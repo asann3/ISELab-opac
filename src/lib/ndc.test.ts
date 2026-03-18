@@ -21,11 +21,11 @@ describe('normalizeNdc', () => {
 })
 
 describe('getNdcLabel', () => {
-  it('NDCコード "007" のラベル "情報科学" を取得できる', () => {
+  it('NDCコード "007" のラベルを取得できる', () => {
     expect(getNdcLabel('007')).toBe('情報科学')
   })
 
   it('存在しないNDCコードはundefinedを返す', () => {
-    expect(getNdcLabel('999')).toBeUndefined()
+    expect(getNdcLabel('001')).toBeUndefined()
   })
 })
