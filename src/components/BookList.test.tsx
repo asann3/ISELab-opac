@@ -5,6 +5,7 @@
 // [x] NdcFilterで分類を選択するとNDCでフィルタリングされる
 // [x] NdcFilterで「すべて」を選択するとフィルタが解除される
 // [x] テキスト検索とNDCフィルタを組み合わせて絞り込める
+// [ ] isStale=trueのときキャッシュ警告バナーが表示される
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -97,5 +98,10 @@ describe('BookList', () => {
     expect(screen.getByText('Pythonではじめる機械学習')).toBeDefined()
     expect(screen.queryByText('リーダブルコード')).toBeNull()
     expect(screen.queryByText('プログラミング言語C')).toBeNull()
+  })
+
+  it('isStale=trueのときキャッシュ警告バナーが表示される', async () => {
+    await act(() => render(<BookList books={books} isStale={true} />))
+    expect(screen.getByRole('alert')).toBeDefined()
   })
 })
