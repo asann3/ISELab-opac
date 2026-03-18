@@ -49,6 +49,14 @@ export function RegisterForm() {
   }
 
   async function handleRegister() {
+    if (!book) {
+      const digits = manualIsbn.replace(/[-\s]/g, '')
+      if (!/^\d{10}$|^\d{13}$/.test(digits)) {
+        toast.error('ISBNは10桁または13桁の数字で入力してください')
+        return
+      }
+    }
+
     const payload = book ?? {
       isbn13: manualIsbn,
       title: manualTitle,
