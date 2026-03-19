@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import type { BookRecord } from '@/types/book'
@@ -18,8 +18,13 @@ export function RegisterForm() {
   const [manualAuthor, setManualAuthor] = useState('')
   const [manualPublisher, setManualPublisher] = useState('')
 
+  const phaseRef = useRef(phase)
+  phaseRef.current = phase
+  const isSearchingRef = useRef(false)
+
   const searchByIsbn = useCallback(async (isbnValue: string) => {
     if (!isbnValue) return
+    isSearchingRef.current = true
     setLoading(true)
     try {
       const res = await fetch(
@@ -43,11 +48,14 @@ export function RegisterForm() {
       setPhase('manual')
     } finally {
       setLoading(false)
+      isSearchingRef.current = false
     }
   }, [])
 
   const handleScan = useCallback(
     (scanned: string) => {
+      if (phaseRef.current !== 'input') return
+      if (isSearchingRef.current) return
       setIsbn(scanned)
       void searchByIsbn(scanned)
     },

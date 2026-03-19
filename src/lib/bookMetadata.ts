@@ -69,12 +69,20 @@ async function fetchFromGoogleBooks(isbn13: string) {
     if (!data?.items?.[0]?.volumeInfo) {
       return null
     }
-    return data.items[0].volumeInfo as {
+    const info = data.items[0].volumeInfo as {
       title: string
       authors?: string[]
       publisher?: string
       imageLinks?: { thumbnail?: string }
     }
+    // Google Books は http:// を返すが HTTPS ページで blocked になるため強制変換
+    if (info.imageLinks?.thumbnail) {
+      info.imageLinks.thumbnail = info.imageLinks.thumbnail.replace(
+        /^http:\/\//,
+        'https://',
+      )
+    }
+    return info
   } catch {
     return null
   }
