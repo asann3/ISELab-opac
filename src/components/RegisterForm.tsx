@@ -108,30 +108,35 @@ export function RegisterForm() {
     }
   }
 
+  const cameraVisible = phase === 'input' && !loading
+
   return (
     <div className="flex flex-col gap-3">
+      {/* カメラは常にマウント・動作させ、CSSで表示/非表示を切り替える（start/stopを繰り返さない） */}
+      <div className={cameraVisible ? undefined : 'hidden'}>
+        <BarcodeScanner onScan={handleScan} />
+      </div>
+
       {phase === 'input' && (
-        <>
-          <BarcodeScanner onScan={handleScan} />
-          <div className="flex gap-2">
-            <Input
-              value={isbn}
-              onChange={(e) => setIsbn(e.target.value)}
-              placeholder="ISBNを入力"
-            />
-            <button
-              type="button"
-              onClick={handleSearch}
-              disabled={loading}
-              className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
-            >
-              {loading ? '検索中…' : '検索'}
-            </button>
-          </div>
-        </>
+        <div className="flex gap-2">
+          <Input
+            value={isbn}
+            onChange={(e) => setIsbn(e.target.value)}
+            placeholder="ISBNを入力"
+            disabled={loading}
+          />
+          <button
+            type="button"
+            onClick={handleSearch}
+            disabled={loading}
+            className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+          >
+            {loading ? '検索中…' : '検索'}
+          </button>
+        </div>
       )}
 
-      {loading && phase !== 'input' && (
+      {loading && phase === 'input' && (
         <p className="text-center text-sm text-muted-foreground">検索中…</p>
       )}
 
