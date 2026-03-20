@@ -11,6 +11,7 @@ ExecStart=__PNPM__ start
 Restart=on-failure
 RestartSec=5
 Environment=NODE_ENV=production
+Environment=PATH=__NODE_BIN__:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile=__PROJECT_DIR__/.env.local
 
 [Install]

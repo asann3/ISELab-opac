@@ -4,10 +4,12 @@ set -e
 USER_NAME=$(whoami)
 PROJECT_DIR=$(cd "$(dirname "$0")/.." && pwd)
 PNPM_PATH=$(which pnpm)
+NODE_BIN=$(dirname "$(which node)")
 
 echo "user: $USER_NAME"
 echo "project: $PROJECT_DIR"
 echo "pnpm: $PNPM_PATH"
+echo "node bin: $NODE_BIN"
 
 echo "[1/4] pnpm install..."
 "$PNPM_PATH" install
@@ -20,6 +22,7 @@ sed \
   -e "s|__USER__|$USER_NAME|g" \
   -e "s|__PROJECT_DIR__|$PROJECT_DIR|g" \
   -e "s|__PNPM__|$PNPM_PATH|g" \
+  -e "s|__NODE_BIN__|$NODE_BIN|g" \
   "$PROJECT_DIR/scripts/opac.service" \
   | sudo tee /etc/systemd/system/opac.service > /dev/null
 
