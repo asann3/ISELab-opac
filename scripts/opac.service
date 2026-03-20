@@ -1,0 +1,17 @@
+[Unit]
+Description=ISE Lab OPAC
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__PROJECT_DIR__
+ExecStart=__PNPM__ start
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+EnvironmentFile=__PROJECT_DIR__/.env.local
+
+[Install]
+WantedBy=multi-user.target

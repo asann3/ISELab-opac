@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "vitest"
+    "test": "vitest",
+    "prepare": "git config core.hooksPath .githooks && chmod +x .githooks/post-merge"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",

@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+
+echo "[post-merge] pnpm install..."
+pnpm install
+
+echo "[post-merge] pnpm build..."
+pnpm build
+
+echo "[post-merge] restarting opac service..."
+sudo systemctl restart opac
+
+echo "[post-merge] done."
