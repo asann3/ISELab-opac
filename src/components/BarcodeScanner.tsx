@@ -44,10 +44,17 @@ export function BarcodeScanner({ onScan }: BarcodeScannerProps) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: retryKey is intentionally used as a re-run trigger
   useEffect(() => {
     setCameraState('starting')
-    const scanner = new Html5Qrcode(containerId, {
-      formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13],
-      verbose: false,
-    })
+
+    let scanner: Html5Qrcode | null = null
+    try {
+      scanner = new Html5Qrcode(containerId, {
+        formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13],
+        verbose: false,
+      })
+    } catch {
+      setCameraState('unavailable')
+      return
+    }
     scannerRef.current = scanner
 
     scanner
@@ -75,8 +82,13 @@ export function BarcodeScanner({ onScan }: BarcodeScannerProps) {
         }
       })
 
+    const captured = scanner
     return () => {
-      scanner.stop().catch(() => {})
+      try {
+        captured.stop().catch(() => {})
+      } catch {
+        // stop() が同期的に throw する場合（scanner未起動など）を無視する
+      }
     }
   }, [onScan, retryKey])
 
