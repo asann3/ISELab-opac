@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { normalizeNdc } from '@/lib/ndc'
 import type { BookRecord } from '@/types/book'
 import { BookCard } from './BookCard'
-import { NdcFilter } from './NdcFilter'
+import { NdcFilter, UNCLASSIFIED } from './NdcFilter'
 import { SearchBar } from './SearchBar'
 
 type BookListProps = {
@@ -25,6 +25,8 @@ export function BookList({ books, isStale = false }: BookListProps) {
     ),
   ].sort()
 
+  const hasUnclassified = books.some((b) => b.ndc === null)
+
   const filtered = books.filter((book) => {
     if (query) {
       const q = query.toLowerCase()
@@ -35,6 +37,7 @@ export function BookList({ books, isStale = false }: BookListProps) {
         return false
       }
     }
+    if (selectedNdc === UNCLASSIFIED) return book.ndc === null
     if (selectedNdc && book.ndc) {
       if (normalizeNdc(book.ndc) !== selectedNdc) return false
     }
@@ -58,6 +61,7 @@ export function BookList({ books, isStale = false }: BookListProps) {
         ndcList={ndcList}
         selected={selectedNdc}
         onChange={setSelectedNdc}
+        hasUnclassified={hasUnclassified}
       />
       <div className="mt-3 text-xs text-muted-foreground">
         {filtered.length}件

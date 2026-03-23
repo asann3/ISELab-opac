@@ -7,6 +7,7 @@
 // [x] テキスト検索とNDCフィルタを組み合わせて絞り込める
 // [x] isStale=trueのときキャッシュ警告バナーが表示される
 // [x] 表示中の件数が表示される
+// [x] ndc=nullの本がある場合「未分類」フィルタが表示され、選択するとndc=nullの本だけ表示される
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -102,6 +103,27 @@ describe('BookList', () => {
     expect(screen.getByText('Pythonではじめる機械学習')).toBeDefined()
     expect(screen.queryByText('リーダブルコード')).toBeNull()
     expect(screen.queryByText('プログラミング言語C')).toBeNull()
+  })
+
+  it('ndc=nullの本がある場合「未分類」フィルタが表示され選択するとndc=nullの本だけ表示される', async () => {
+    const booksWithNull: BookRecord[] = [
+      ...books,
+      {
+        isbn13: '9784000000000' as ISBN13,
+        title: 'NDCなしの本',
+        author: null,
+        publisher: null,
+        ndc: null,
+        ndcEdition: null,
+        thumbnailUrl: null,
+        createdAt: '2025-01-04T00:00:00.000Z',
+      },
+    ]
+    await act(() => render(<BookList books={booksWithNull} />))
+    expect(screen.getByText('未分類')).toBeDefined()
+    await userEvent.click(screen.getByText('未分類'))
+    expect(screen.getByText('NDCなしの本')).toBeDefined()
+    expect(screen.queryByText('リーダブルコード')).toBeNull()
   })
 
   it('isStale=trueのときキャッシュ警告バナーが表示される', async () => {

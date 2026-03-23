@@ -4,6 +4,8 @@
 // [x] 選択肢をクリックするとonChangeが呼ばれる
 // [x] 「すべて」をクリックするとonChangeがnullで呼ばれる
 // [x] 選択中のNDCがハイライトされる
+// [x] hasUnclassified=trueのとき「未分類」ボタンが表示される
+// [x] 「未分類」をクリックするとonChangeが'__unclassified__'で呼ばれる
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -65,6 +67,36 @@ describe('NdcFilter', () => {
     )
     await userEvent.click(screen.getByText('すべて'))
     expect(onChange).toHaveBeenCalledWith(null)
+  })
+
+  it('hasUnclassified=trueのとき「未分類」ボタンが表示される', async () => {
+    await act(() =>
+      render(
+        <NdcFilter
+          ndcList={['007']}
+          selected={null}
+          onChange={() => {}}
+          hasUnclassified={true}
+        />,
+      ),
+    )
+    expect(screen.getByText('未分類')).toBeDefined()
+  })
+
+  it("「未分類」をクリックするとonChangeが'__unclassified__'で呼ばれる", async () => {
+    const onChange = vi.fn()
+    await act(() =>
+      render(
+        <NdcFilter
+          ndcList={['007']}
+          selected={null}
+          onChange={onChange}
+          hasUnclassified={true}
+        />,
+      ),
+    )
+    await userEvent.click(screen.getByText('未分類'))
+    expect(onChange).toHaveBeenCalledWith('__unclassified__')
   })
 
   it('選択中のNDCがハイライトされる', async () => {
