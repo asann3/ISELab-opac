@@ -70,7 +70,9 @@ async function fetchOpenBD(
   }
 }
 
-async function fetchGoogleBooksThumbnail(isbn: string): Promise<string | null> {
+async function fetchGoogleBooks(
+  isbn: string,
+): Promise<{ publisher: string | null; thumbnailUrl: string | null } | null> {
   try {
     const apiKey = process.env.GOOGLE_BOOKS_API_KEY
     const keyParam = apiKey ? `&key=${apiKey}` : ''
@@ -78,10 +80,18 @@ async function fetchGoogleBooksThumbnail(isbn: string): Promise<string | null> {
       `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}${keyParam}`,
     )
     const data = await res.json()
-    const thumbnail = data?.items?.[0]?.volumeInfo?.imageLinks?.thumbnail
-    if (thumbnail) return thumbnail.replace(/^http:\/\//, 'https://')
-  } catch {}
-  return null
+    const info = data?.items?.[0]?.volumeInfo
+    if (!info) return null
+    const thumbnail = info.imageLinks?.thumbnail
+    return {
+      publisher: info.publisher || null,
+      thumbnailUrl: thumbnail
+        ? thumbnail.replace(/^http:\/\//, 'https://')
+        : null,
+    }
+  } catch {
+    return null
+  }
 }
 
 async function sleep(ms: number) {
@@ -104,7 +114,7 @@ async function main() {
   const targets = rows
     .slice(1)
     .map((row, i) => ({ row, rowIndex: i + 2 }))
-    .filter(({ row }) => row[0] && (!row[3] || !row[4] || !row[5]))
+    .filter(({ row }) => row[0] && (!row[3] || !row[4] || !row[6]))
 
   console.log(`対象: ${targets.length}件 / 全${rows.length - 1}件`)
 
@@ -115,7 +125,7 @@ async function main() {
     const isbn = row[0]
     const needsPublisher = !row[3]
     const needsNdc = !row[4]
-    const needsThumbnail = !row[5]
+    const needsThumbnail = !row[6]
 
     const filled: string[] = []
 
@@ -137,21 +147,31 @@ async function main() {
 
     if (needsPublisher || needsThumbnail) {
       const openbd = await fetchOpenBD(isbn)
-      if (needsPublisher && openbd?.publisher) {
-        updates.push({
-          range: `${sheetName}!D${rowIndex}`,
-          values: [[openbd.publisher]],
-        })
-        filled.push(`pub:${openbd.publisher}`)
+      const googleBooks =
+        (needsPublisher && !openbd?.publisher) ||
+        (!openbd?.thumbnailUrl && needsThumbnail)
+          ? await fetchGoogleBooks(isbn)
+          : null
+      if (needsPublisher) {
+        const publisher = openbd?.publisher ?? googleBooks?.publisher ?? null
+        if (publisher) {
+          updates.push({
+            range: `${sheetName}!D${rowIndex}`,
+            values: [[publisher]],
+          })
+          filled.push(`pub:${publisher}`)
+        }
       }
-      const thumbnailUrl =
-        openbd?.thumbnailUrl ?? (await fetchGoogleBooksThumbnail(isbn))
-      if (needsThumbnail && thumbnailUrl) {
-        updates.push({
-          range: `${sheetName}!G${rowIndex}`,
-          values: [[thumbnailUrl]],
-        })
-        filled.push('thumb:ok')
+      if (needsThumbnail) {
+        const thumbnailUrl =
+          openbd?.thumbnailUrl ?? googleBooks?.thumbnailUrl ?? null
+        if (thumbnailUrl) {
+          updates.push({
+            range: `${sheetName}!G${rowIndex}`,
+            values: [[thumbnailUrl]],
+          })
+          filled.push('thumb:ok')
+        }
       }
       await sleep(200)
     }
