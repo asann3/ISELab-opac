@@ -17,7 +17,7 @@ const sheetName = process.env.SHEET_NAME ?? 'Books'
 export async function getAllBooks(): Promise<BookRecord[]> {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${sheetName}!A:G`,
+    range: `${sheetName}!A:H`,
   })
 
   const rows = res.data.values
@@ -41,6 +41,7 @@ export async function getAllBooks(): Promise<BookRecord[]> {
       ndc: row[4] || null,
       thumbnailUrl: row[5] || null,
       createdAt: row[6],
+      ndcEdition: row[7] ? (Number(row[7]) as 9 | 10) : null,
     }))
 }
 
@@ -59,7 +60,7 @@ export async function saveBookToSpreadsheet(book: BookRecord): Promise<void> {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: `${sheetName}!A:G`,
+    range: `${sheetName}!A:H`,
     valueInputOption: 'RAW',
     requestBody: {
       values: [
@@ -71,6 +72,7 @@ export async function saveBookToSpreadsheet(book: BookRecord): Promise<void> {
           book.ndc ?? '',
           book.thumbnailUrl ?? '',
           book.createdAt,
+          book.ndcEdition != null ? String(book.ndcEdition) : '',
         ],
       ],
     },

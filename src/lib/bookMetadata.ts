@@ -4,7 +4,9 @@ export async function fetchBookMetadata(
   isbn13: ISBN13,
 ): Promise<BookRecord | null> {
   const openbd = await fetchFromOpenBD(isbn13)
-  const ndc = await fetchNdcFromNDL(isbn13)
+  const ndcResult = await fetchNdcFromNDL(isbn13)
+  const ndc = ndcResult?.code ?? null
+  const ndcEdition = ndcResult?.edition ?? null
 
   if (openbd) {
     let thumbnailUrl = openbd.cover || null
@@ -21,6 +23,7 @@ export async function fetchBookMetadata(
       author: openbd.author || null,
       publisher: openbd.publisher || null,
       ndc,
+      ndcEdition,
       thumbnailUrl,
       createdAt: new Date().toISOString(),
     }
@@ -34,6 +37,7 @@ export async function fetchBookMetadata(
       author: googleBooks.authors?.[0] ?? null,
       publisher: googleBooks.publisher ?? null,
       ndc,
+      ndcEdition,
       thumbnailUrl: googleBooks.imageLinks?.thumbnail ?? null,
       createdAt: new Date().toISOString(),
     }
@@ -97,14 +101,20 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-async function fetchNdcFromNDL(isbn13: string): Promise<string | null> {
+async function fetchNdcFromNDL(
+  isbn13: string,
+): Promise<{ code: string; edition: 9 | 10 } | null> {
   try {
     const res = await fetch(
       `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&query=isbn%3D${isbn13}&recordSchema=dcndl`,
     )
     const xml = await res.text()
-    const match = xml.match(/ndc9\/([0-9.]+)/)
-    return match ? match[1] : null
+    const matches = [...xml.matchAll(/ndc(\d+)\/([0-9.]+)/g)]
+    const ndc10 = matches.find((m) => m[1] === '10')
+    if (ndc10) return { code: ndc10[2], edition: 10 }
+    const ndc9 = matches.find((m) => m[1] === '9')
+    if (ndc9) return { code: ndc9[2], edition: 9 }
+    return null
   } catch {
     return null
   }

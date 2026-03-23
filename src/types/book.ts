@@ -6,6 +6,7 @@ export interface BookRecord {
   author: string | null
   publisher: string | null
   ndc: string | null
+  ndcEdition: 9 | 10 | null
   thumbnailUrl: string | null
   createdAt: string
 }

@@ -50,7 +50,7 @@ describe('fetchBookMetadata', () => {
     })
   })
 
-  it('NDLからNDCを取得できる', async () => {
+  it('NDLからNDC9コードを取得でき、editionが9になる', async () => {
     const mockFetch = vi.mocked(fetch)
     mockFetch.mockImplementation(async (url) => {
       const urlStr = url.toString()
@@ -85,9 +85,85 @@ describe('fetchBookMetadata', () => {
     expect(result).toMatchObject({
       isbn13: '9784873115658',
       title: 'リーダブルコード',
-      author: 'Dustin Boswell',
-      publisher: 'オライリージャパン',
       ndc: '007.64',
+      ndcEdition: 9,
+    })
+  })
+
+  it('NDLからNDC10コードを取得でき、editionが10になる', async () => {
+    const mockFetch = vi.mocked(fetch)
+    mockFetch.mockImplementation(async (url) => {
+      const urlStr = url.toString()
+      if (urlStr.includes('openbd')) {
+        return new Response(
+          JSON.stringify([
+            {
+              summary: {
+                title: 'テスト書籍',
+                author: '著者',
+                publisher: '出版社',
+                cover: '',
+              },
+            },
+          ]),
+        )
+      }
+      if (urlStr.includes('ndlsearch')) {
+        return new Response(
+          `<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/">
+            <records><record><recordPacking>string</recordPacking><recordData>
+              &lt;dcterms:subject rdf:resource="http://id.ndl.go.jp/class/ndc10/007.37"/&gt;
+            </recordData></record></records>
+          </searchRetrieveResponse>`,
+        )
+      }
+      return new Response('', { status: 404 })
+    })
+
+    const result = await fetchBookMetadata(TEST_ISBN)
+
+    expect(result).toMatchObject({
+      ndc: '007.37',
+      ndcEdition: 10,
+    })
+  })
+
+  it('NDLからNDC9とNDC10が両方あればNDC10を優先する', async () => {
+    const mockFetch = vi.mocked(fetch)
+    mockFetch.mockImplementation(async (url) => {
+      const urlStr = url.toString()
+      if (urlStr.includes('openbd')) {
+        return new Response(
+          JSON.stringify([
+            {
+              summary: {
+                title: 'テスト書籍',
+                author: '著者',
+                publisher: '出版社',
+                cover: '',
+              },
+            },
+          ]),
+        )
+      }
+      if (urlStr.includes('ndlsearch')) {
+        return new Response(
+          `<searchRetrieveResponse xmlns="http://www.loc.gov/zing/srw/">
+            <records><record><recordPacking>string</recordPacking><recordData>
+              &lt;dcterms:subject rdf:resource="http://id.ndl.go.jp/class/ndc9/007.64"/&gt;
+              &lt;dcterms:subject rdf:resource="http://id.ndl.go.jp/class/ndc10/007.37"/&gt;
+            </recordData></record></records>
+          </searchRetrieveResponse>`,
+        )
+      }
+      return new Response('', { status: 404 })
+    })
+
+    const result = await fetchBookMetadata(TEST_ISBN)
+
+    expect(result).toMatchObject({
+      ndc: '007.37',
+      ndcEdition: 10,
     })
   })
 

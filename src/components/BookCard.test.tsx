@@ -20,6 +20,7 @@ const baseBook: BookRecord = {
   author: 'Dustin Boswell',
   publisher: 'オライリージャパン',
   ndc: '007.64',
+  ndcEdition: 9,
   thumbnailUrl: null,
   createdAt: '2025-01-01T00:00:00.000Z',
 }

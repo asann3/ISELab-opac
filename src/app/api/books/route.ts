@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     author: body.author ?? null,
     publisher: body.publisher ?? null,
     ndc: body.ndc ?? null,
+    ndcEdition: body.ndcEdition ?? null,
     thumbnailUrl: body.thumbnailUrl ?? null,
     createdAt: new Date().toISOString(),
   }

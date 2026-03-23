@@ -41,6 +41,7 @@ const HEADER_ROW = [
   'ndc',
   'thumbnailUrl',
   'createdAt',
+  'ndcEdition',
 ]
 
 const toRow = (book: typeof mockBook) => [
@@ -51,6 +52,7 @@ const toRow = (book: typeof mockBook) => [
   book.ndc ?? '',
   book.thumbnailUrl ?? '',
   book.createdAt,
+  book.ndcEdition != null ? String(book.ndcEdition) : '',
 ]
 
 describe('getAllBooks', () => {
@@ -83,7 +85,16 @@ describe('getAllBooks', () => {
       data: {
         values: [
           HEADER_ROW,
-          [mockBook.isbn13, mockBook.title, '', '', '', '', mockBook.createdAt],
+          [
+            mockBook.isbn13,
+            mockBook.title,
+            '',
+            '',
+            '',
+            '',
+            mockBook.createdAt,
+            '',
+          ],
         ],
       },
     })
@@ -96,6 +107,7 @@ describe('getAllBooks', () => {
         author: null,
         publisher: null,
         ndc: null,
+        ndcEdition: null,
         thumbnailUrl: null,
       },
     ])
