@@ -5,7 +5,8 @@
 // [x] NdcFilterで分類を選択するとNDCでフィルタリングされる
 // [x] NdcFilterで「すべて」を選択するとフィルタが解除される
 // [x] テキスト検索とNDCフィルタを組み合わせて絞り込める
-// [ ] isStale=trueのときキャッシュ警告バナーが表示される
+// [x] isStale=trueのときキャッシュ警告バナーが表示される
+// [x] 表示中の件数が表示される
 
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -106,5 +107,14 @@ describe('BookList', () => {
   it('isStale=trueのときキャッシュ警告バナーが表示される', async () => {
     await act(() => render(<BookList books={books} isStale={true} />))
     expect(screen.getByRole('alert')).toBeDefined()
+  })
+
+  it('表示中の件数が表示される', async () => {
+    await act(() => render(<BookList books={books} />))
+    expect(screen.getByText('2件')).toBeDefined()
+
+    const input = screen.getByPlaceholderText('タイトル・著者名で検索')
+    await userEvent.type(input, 'リーダブル')
+    expect(screen.getByText('1件')).toBeDefined()
   })
 })

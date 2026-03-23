@@ -59,7 +59,10 @@ export function BookList({ books, isStale = false }: BookListProps) {
         selected={selectedNdc}
         onChange={setSelectedNdc}
       />
-      <div className="mt-4 flex flex-col gap-3">
+      <div className="mt-3 text-xs text-muted-foreground">
+        {filtered.length}件
+      </div>
+      <div className="mt-2 flex flex-col gap-3">
         {filtered.map((book) => (
           <BookCard key={book.isbn13} book={book} />
         ))}
