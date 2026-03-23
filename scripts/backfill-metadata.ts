@@ -34,14 +34,20 @@ const sheets = google.sheets({ version: 'v4', auth })
 const spreadsheetId = process.env.SPREADSHEET_ID ?? ''
 const sheetName = process.env.SHEET_NAME ?? 'Books'
 
-async function fetchNdc(isbn: string): Promise<string | null> {
+async function fetchNdc(
+  isbn: string,
+): Promise<{ code: string; edition: 9 | 10 } | null> {
   try {
     const res = await fetch(
       `https://ndlsearch.ndl.go.jp/api/sru?operation=searchRetrieve&query=isbn%3D${isbn}&recordSchema=dcndl`,
     )
     const xml = await res.text()
-    const match = xml.match(/ndc9\/([0-9.]+)/)
-    return match ? match[1] : null
+    const matches = [...xml.matchAll(/ndc(\d+)\/([0-9.]+)/g)]
+    const ndc10 = matches.find((m) => m[1] === '10')
+    if (ndc10) return { code: ndc10[2], edition: 10 }
+    const ndc9 = matches.find((m) => m[1] === '9')
+    if (ndc9) return { code: ndc9[2], edition: 9 }
+    return null
   } catch {
     return null
   }
@@ -49,19 +55,33 @@ async function fetchNdc(isbn: string): Promise<string | null> {
 
 async function fetchOpenBD(
   isbn: string,
-): Promise<{ publisher: string; thumbnailUrl: string | null } | null> {
+): Promise<{ publisher: string | null; thumbnailUrl: string | null } | null> {
   try {
     const res = await fetch(`https://api.openbd.jp/v1/get?isbn=${isbn}`)
     const data = await res.json()
     const summary = data?.[0]?.summary
     if (!summary) return null
     return {
-      publisher: summary.publisher || '',
+      publisher: summary.publisher || null,
       thumbnailUrl: summary.cover || null,
     }
   } catch {
     return null
   }
+}
+
+async function fetchGoogleBooksThumbnail(isbn: string): Promise<string | null> {
+  try {
+    const apiKey = process.env.GOOGLE_BOOKS_API_KEY
+    const keyParam = apiKey ? `&key=${apiKey}` : ''
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}${keyParam}`,
+    )
+    const data = await res.json()
+    const thumbnail = data?.items?.[0]?.volumeInfo?.imageLinks?.thumbnail
+    if (thumbnail) return thumbnail.replace(/^http:\/\//, 'https://')
+  } catch {}
+  return null
 }
 
 async function sleep(ms: number) {
@@ -71,7 +91,7 @@ async function sleep(ms: number) {
 async function main() {
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${sheetName}!A:G`,
+    range: `${sheetName}!A:H`,
   })
 
   const rows = res.data.values
@@ -97,48 +117,47 @@ async function main() {
     const needsNdc = !row[4]
     const needsThumbnail = !row[5]
 
-    let ndc: string | null = null
-    let publisher: string | null = null
-    let thumbnailUrl: string | null = null
+    const filled: string[] = []
 
     if (needsNdc) {
-      ndc = await fetchNdc(isbn)
+      const ndcResult = await fetchNdc(isbn)
+      if (ndcResult) {
+        updates.push({
+          range: `${sheetName}!E${rowIndex}`,
+          values: [[ndcResult.code]],
+        })
+        updates.push({
+          range: `${sheetName}!H${rowIndex}`,
+          values: [[String(ndcResult.edition)]],
+        })
+        filled.push(`ndc:${ndcResult.code}(${ndcResult.edition})`)
+      }
       await sleep(300)
     }
+
     if (needsPublisher || needsThumbnail) {
       const openbd = await fetchOpenBD(isbn)
-      if (openbd) {
-        publisher = openbd.publisher || null
-        thumbnailUrl = openbd.thumbnailUrl
+      if (needsPublisher && openbd?.publisher) {
+        updates.push({
+          range: `${sheetName}!D${rowIndex}`,
+          values: [[openbd.publisher]],
+        })
+        filled.push(`pub:${openbd.publisher}`)
+      }
+      const thumbnailUrl = openbd?.thumbnailUrl ?? await fetchGoogleBooksThumbnail(isbn)
+      if (needsThumbnail && thumbnailUrl) {
+        updates.push({
+          range: `${sheetName}!F${rowIndex}`,
+          values: [[thumbnailUrl]],
+        })
+        filled.push('thumb:ok')
       }
       await sleep(200)
     }
 
-    if (needsPublisher && publisher) {
-      updates.push({
-        range: `${sheetName}!D${rowIndex}`,
-        values: [[publisher]],
-      })
-    }
-    if (needsNdc && ndc) {
-      updates.push({ range: `${sheetName}!E${rowIndex}`, values: [[ndc]] })
-    }
-    if (needsThumbnail && thumbnailUrl) {
-      updates.push({
-        range: `${sheetName}!F${rowIndex}`,
-        values: [[thumbnailUrl]],
-      })
-    }
-
-    const filled =
-      [
-        needsNdc && ndc ? `ndc:${ndc}` : null,
-        needsPublisher && publisher ? `pub:${publisher}` : null,
-        needsThumbnail && thumbnailUrl ? 'thumb:ok' : null,
-      ]
-        .filter(Boolean)
-        .join(', ') || '取得不可'
-    console.log(`[${i + 1}/${targets.length}] ${isbn} → ${filled}`)
+    console.log(
+      `[${i + 1}/${targets.length}] ${isbn} → ${filled.join(', ') || '取得不可'}`,
+    )
   }
 
   if (updates.length > 0) {

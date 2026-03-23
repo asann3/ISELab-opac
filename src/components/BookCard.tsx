@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { Badge } from '@/components/ui/badge'
 import type { BookRecord } from '@/types/book'
 
@@ -9,11 +10,19 @@ interface BookCardProps {
 
 export function BookCard({ book }: BookCardProps) {
   const imgSrc = book.thumbnailUrl ?? '/no-image.svg'
+  const imgRef = useRef<HTMLImageElement>(null)
+
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+      imgRef.current.style.opacity = '1'
+    }
+  }, [])
 
   return (
     <div className="group flex gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50">
       <div className="h-24 w-16 shrink-0 overflow-hidden rounded-sm bg-muted bg-[url('/no-image.svg')] bg-cover bg-center bg-no-repeat">
         <img
+          ref={imgRef}
           src={imgSrc}
           alt={book.title}
           className="h-full w-full object-cover"

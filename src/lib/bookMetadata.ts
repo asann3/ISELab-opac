@@ -66,8 +66,10 @@ async function fetchFromOpenBD(isbn13: string) {
 
 async function fetchFromGoogleBooks(isbn13: string) {
   try {
+    const apiKey = process.env.GOOGLE_BOOKS_API_KEY
+    const keyParam = apiKey ? `&key=${apiKey}` : ''
     const res = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn13}`,
+      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn13}${keyParam}`,
     )
     const data = await res.json()
     if (!data?.items?.[0]?.volumeInfo) {
