@@ -127,7 +127,7 @@ async function main() {
           values: [[ndcResult.code]],
         })
         updates.push({
-          range: `${sheetName}!H${rowIndex}`,
+          range: `${sheetName}!F${rowIndex}`,
           values: [[String(ndcResult.edition)]],
         })
         filled.push(`ndc:${ndcResult.code}(${ndcResult.edition})`)
@@ -144,10 +144,11 @@ async function main() {
         })
         filled.push(`pub:${openbd.publisher}`)
       }
-      const thumbnailUrl = openbd?.thumbnailUrl ?? await fetchGoogleBooksThumbnail(isbn)
+      const thumbnailUrl =
+        openbd?.thumbnailUrl ?? (await fetchGoogleBooksThumbnail(isbn))
       if (needsThumbnail && thumbnailUrl) {
         updates.push({
-          range: `${sheetName}!F${rowIndex}`,
+          range: `${sheetName}!G${rowIndex}`,
           values: [[thumbnailUrl]],
         })
         filled.push('thumb:ok')

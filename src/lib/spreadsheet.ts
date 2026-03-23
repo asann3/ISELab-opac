@@ -39,9 +39,9 @@ export async function getAllBooks(): Promise<BookRecord[]> {
       author: row[2] || null,
       publisher: row[3] || null,
       ndc: row[4] || null,
-      thumbnailUrl: row[5] || null,
-      createdAt: row[6],
-      ndcEdition: row[7] ? (Number(row[7]) as 9 | 10) : null,
+      ndcEdition: row[5] ? (Number(row[5]) as 9 | 10) : null,
+      thumbnailUrl: row[6] || null,
+      createdAt: row[7],
     }))
 }
 
@@ -70,9 +70,9 @@ export async function saveBookToSpreadsheet(book: BookRecord): Promise<void> {
           book.author ?? '',
           book.publisher ?? '',
           book.ndc ?? '',
+          book.ndcEdition != null ? String(book.ndcEdition) : '',
           book.thumbnailUrl ?? '',
           book.createdAt,
-          book.ndcEdition != null ? String(book.ndcEdition) : '',
         ],
       ],
     },
