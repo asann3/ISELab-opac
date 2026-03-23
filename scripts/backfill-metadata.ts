@@ -128,6 +128,7 @@ async function main() {
     const needsThumbnail = !row[6]
 
     const filled: string[] = []
+    const missing: string[] = []
 
     if (needsNdc) {
       const ndcResult = await fetchNdc(isbn)
@@ -141,6 +142,8 @@ async function main() {
           values: [[String(ndcResult.edition)]],
         })
         filled.push(`ndc:${ndcResult.code}(${ndcResult.edition})`)
+      } else {
+        missing.push('ndc')
       }
       await sleep(300)
     }
@@ -160,6 +163,8 @@ async function main() {
             values: [[publisher]],
           })
           filled.push(`pub:${publisher}`)
+        } else {
+          missing.push('pub')
         }
       }
       if (needsThumbnail) {
@@ -171,13 +176,18 @@ async function main() {
             values: [[thumbnailUrl]],
           })
           filled.push('thumb:ok')
+        } else {
+          missing.push('thumb')
         }
       }
       await sleep(200)
     }
 
+    const filledStr = filled.length ? filled.join(', ') : ''
+    const missingStr = missing.length ? `取得不可(${missing.join(',')})` : ''
+    const status = [filledStr, missingStr].filter(Boolean).join(' / ')
     console.log(
-      `[${i + 1}/${targets.length}] ${isbn} → ${filled.join(', ') || '取得不可'}`,
+      `[${i + 1}/${targets.length}] ${isbn} → ${status || 'スキップ'}`,
     )
   }
 
